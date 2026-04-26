@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Fitness App</title>
+</head>
+<body>
+
+  <h2>Enter your name:</h2>
+
+  <input type="text" id="nameInput" placeholder="Your name here">
+  <button onclick="showName()">Submit</button>
+
+  <p id="result"></p>
+
+  <script>
+    function showName() {
+      let name = document.getElementById("nameInput").value;
+      document.getElementById("result").innerText = "Your name is: " + name;
+    }
+  </script>
+
+</body>
+</html>
