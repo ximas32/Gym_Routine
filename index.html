@@ -2,12 +2,42 @@
 <html>
 <head>
   <title>My Fitness App</title>
+
+  <!-- Wichtig für Mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 18px;
+      width: 80%;
+      max-width: 300px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+  </style>
 </head>
 <body>
 
-  <h2>Enter your name here:</h2>
+  <h2>Enter your name:</h2>
 
   <input type="text" id="nameInput" placeholder="Your name here">
+  <br>
   <button onclick="showName()">Submit</button>
 
   <p id="result"></p>
