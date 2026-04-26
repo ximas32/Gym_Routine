@@ -1,53 +1,161 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Fitness App</title>
-
-  <!-- Wichtig für Mobile -->
+  <title>Fitness App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Arial;
       text-align: center;
-      padding: 40px;
-    }
-
-    input {
-      padding: 10px;
-      font-size: 18px;
-      width: 80%;
-      max-width: 300px;
-      margin-bottom: 10px;
+      padding: 20px;
     }
 
     button {
-      padding: 10px 20px;
-      font-size: 18px;
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
     }
 
-    #result {
-      margin-top: 20px;
-      font-size: 20px;
+    input {
+      padding: 8px;
+      margin: 5px;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
 
-  <h2>Enter your name:</h2>
+<h2>Fitness App</h2>
 
-  <input type="text" id="nameInput" placeholder="Your name here">
-  <br>
-  <button onclick="showName()">Submit</button>
+<!-- MENU -->
+<div>
+  <button onclick="showPage('create')">Workout erstellen</button>
+  <button onclick="showPage('workout')">Workout</button>
+  <button onclick="showPage('progress')">Progress</button>
+</div>
 
-  <p id="result"></p>
+<hr>
 
-  <script>
-    function showName() {
-      let name = document.getElementById("nameInput").value;
-      document.getElementById("result").innerText = "Your name is: " + name;
-    }
-  </script>
+<!-- CREATE -->
+<div id="createPage">
+  <h3>Workout erstellen</h3>
+
+  <input id="workoutName" placeholder="Workout Name"><br>
+
+  <h4>Übung hinzufügen</h4>
+  <input id="exerciseName" placeholder="Übung"><br>
+  <input id="sets" placeholder="Sätze"><br>
+  <input id="weight" placeholder="Gewicht"><br>
+
+  <button onclick="addExercise()">Übung hinzufügen</button>
+
+  <ul id="exerciseList"></ul>
+
+  <button onclick="saveWorkout()">Workout speichern</button>
+</div>
+
+<!-- WORKOUT -->
+<div id="workoutPage" class="hidden">
+  <h3>Workouts</h3>
+
+  <select id="workoutSelect" onchange="loadWorkout()"></select>
+
+  <ul id="workoutDisplay"></ul>
+</div>
+
+<!-- PROGRESS -->
+<div id="progressPage" class="hidden">
+  <h3>Progress</h3>
+  <p>Kommt später 😉</p>
+</div>
+
+<script>
+let currentExercises = [];
+
+// Navigation
+function showPage(page) {
+  document.getElementById("createPage").classList.add("hidden");
+  document.getElementById("workoutPage").classList.add("hidden");
+  document.getElementById("progressPage").classList.add("hidden");
+
+  document.getElementById(page + "Page").classList.remove("hidden");
+}
+
+// Übung hinzufügen
+function addExercise() {
+  let name = document.getElementById("exerciseName").value;
+  let sets = document.getElementById("sets").value;
+  let weight = document.getElementById("weight").value;
+
+  let exercise = { name, sets, weight };
+  currentExercises.push(exercise);
+
+  let li = document.createElement("li");
+  li.innerText = name + " - " + sets + " Sätze - " + weight + "kg";
+  document.getElementById("exerciseList").appendChild(li);
+
+  document.getElementById("exerciseName").value = "";
+  document.getElementById("sets").value = "";
+  document.getElementById("weight").value = "";
+}
+
+// Workout speichern
+function saveWorkout() {
+  let name = document.getElementById("workoutName").value;
+
+  let workouts = JSON.parse(localStorage.getItem("workouts")) || {};
+
+  workouts[name] = currentExercises;
+
+  localStorage.setItem("workouts", JSON.stringify(workouts));
+
+  alert("Gespeichert!");
+
+  currentExercises = [];
+  document.getElementById("exerciseList").innerHTML = "";
+
+  loadWorkoutList();
+}
+
+// Dropdown laden
+function loadWorkoutList() {
+  let workouts = JSON.parse(localStorage.getItem("workouts")) || {};
+  let select = document.getElementById("workoutSelect");
+
+  select.innerHTML = "";
+
+  for (let name in workouts) {
+    let option = document.createElement("option");
+    option.value = name;
+    option.text = name;
+    select.appendChild(option);
+  }
+}
+
+// Workout anzeigen
+function loadWorkout() {
+  let workouts = JSON.parse(localStorage.getItem("workouts")) || {};
+  let selected = document.getElementById("workoutSelect").value;
+
+  let display = document.getElementById("workoutDisplay");
+  display.innerHTML = "";
+
+  workouts[selected].forEach(ex => {
+    let li = document.createElement("li");
+    li.innerText = ex.name + " - " + ex.sets + " Sätze - " + ex.weight + "kg";
+    display.appendChild(li);
+  });
+}
+
+// Beim Start laden
+loadWorkoutList();
+</script>
 
 </body>
 </html>
