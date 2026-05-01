@@ -17,21 +17,29 @@ function showCreateMode() {
   currentExercises = [];
 
   document.getElementById("createMode").innerHTML = `
-    <h4>Neues Workout</h4>
+  <h4>Neues Workout</h4>
 
-    <input id="workoutName" placeholder="Workout Name"><br>
+  <label>Workout Name</label><br>
+  <input id="workoutName"><br><br>
 
-    <input id="exerciseName" placeholder="Übung"><br>
-    <input id="sets" placeholder="Sätze"><br>
-    <input id="reps" placeholder="Reps"><br>
-    <input id="weight" placeholder="Gewicht"><br>
+  <label>Übung</label><br>
+  <input id="exerciseName"><br>
 
-    <button onclick="addExercise()">Übung hinzufügen</button>
+  <label>Sätze</label><br>
+  <input id="sets"><br>
 
-    <ul id="exerciseList"></ul>
+  <label>Reps</label><br>
+  <input id="reps"><br>
 
-    <button onclick="saveWorkout()">Speichern</button>
-  `;
+  <label>Gewicht</label><br>
+  <input id="weight"><br><br>
+
+  <button onclick="addExercise()">Übung hinzufügen</button>
+
+  <ul id="exerciseList"></ul>
+
+  <button onclick="saveWorkout()">Speichern</button>
+`;
 }
 
 

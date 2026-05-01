@@ -4,17 +4,24 @@
 function addExerciseToWorkout() {
   let list = document.getElementById("editList");
 
-  list.innerHTML = `
-    <h4>Neue Übung</h4>
+ list.innerHTML = `
+  <h4>Neue Übung</h4>
 
-    <input id="new_name" placeholder="Übung"><br>
-    <input id="new_sets" placeholder="Sätze"><br>
-    <input id="new_reps" placeholder="Reps"><br>
-    <input id="new_weight" placeholder="Gewicht"><br>
+  <label>Übung</label><br>
+  <input id="new_name"><br>
 
-    <button onclick="saveNewExercise()">Speichern</button>
-    <button onclick="loadEditWorkout()">Zurück</button>
-  `;
+  <label>Sätze</label><br>
+  <input id="new_sets"><br>
+
+  <label>Reps</label><br>
+  <input id="new_reps"><br>
+
+  <label>Gewicht</label><br>
+  <input id="new_weight"><br><br>
+
+  <button onclick="saveNewExercise()">Speichern</button>
+  <button onclick="loadEditWorkout()">Zurück</button>
+`;
 }
 
 function saveNewExercise() {
@@ -140,16 +147,23 @@ function openEditExercise(index) {
   let list = document.getElementById("editList");
 
   list.innerHTML = `
-    <h4>Übung bearbeiten</h4>
+  <h4>Übung bearbeiten</h4>
 
-    <input id="edit_name" value="${ex.name}" placeholder="Übung"><br>
-    <input id="edit_sets" value="${ex.sets}" placeholder="Sätze"><br>
-    <input id="edit_reps" value="${ex.reps}" placeholder="Reps"><br>
-    <input id="edit_weight" value="${ex.weight}" placeholder="Gewicht"><br>
+  <label>Übung</label><br>
+  <input id="edit_name" value="${ex.name}"><br>
 
-    <button onclick="saveEditExercise(${index})">Speichern</button>
-    <button onclick="loadEditWorkout()">Zurück</button>
-  `;
+  <label>Sätze</label><br>
+  <input id="edit_sets" value="${ex.sets}"><br>
+
+  <label>Reps</label><br>
+  <input id="edit_reps" value="${ex.reps}"><br>
+
+  <label>Gewicht</label><br>
+  <input id="edit_weight" value="${ex.weight}"><br><br>
+
+  <button onclick="saveEditExercise(${index})">Speichern</button>
+  <button onclick="loadEditWorkout()">Zurück</button>
+`;
 }
 
 
@@ -168,10 +182,11 @@ function loadEditWorkout() {
     let li = document.createElement("li");
 
     li.innerHTML = `
-      ${ex.name}
-      <button onclick="openEditExercise(${index})">Bearbeiten</button>
-      <button onclick="deleteExercise(${index})">Löschen</button>
-    `;
+  ${ex.name} – ${ex.sets}x${ex.reps} (${ex.weight}kg)
+
+  <button onclick="openEditExercise(${index})">Bearbeiten</button>
+  <button onclick="deleteExercise(${index})">Löschen</button>
+`;
 
     list.appendChild(li);
   });

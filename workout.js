@@ -1,34 +1,76 @@
+// 🔥 UI aufbauen
 document.getElementById("workoutPage").innerHTML = `
-  <h3>Workouts</h3>
+  <h3 id="workoutTitle">Workouts</h3>
   <select id="workoutSelect" onchange="loadWorkout()"></select>
   <ul id="workoutDisplay"></ul>
 `;
+
+// 🔥 aktuelle Session
 let currentSession = {};
+
+
+// ✅ Dropdown laden
+function loadWorkoutList() {
+  let workouts = getWorkouts();
+  let select = document.getElementById("workoutSelect");
+
+  if (!select) return;
+
+  select.innerHTML = "";
+
+  // 👇 Default Option
+  let defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.text = "Bitte wählen";
+  defaultOption.selected = true;
+
+  select.appendChild(defaultOption);
+
+  // 👇 Workouts
+  for (let name in workouts) {
+    let option = document.createElement("option");
+    option.value = name;
+    option.text = name;
+    select.appendChild(option);
+  }
+}
+
+
+// ✅ Workout laden / anzeigen
 function loadWorkout() {
   let workouts = getWorkouts();
   let selected = document.getElementById("workoutSelect").value;
+  let title = document.getElementById("workoutTitle");
+  let display = document.getElementById("workoutDisplay");
 
-  if (!selected) return;
+  // 👇 nichts gewählt
+  if (!selected) {
+  title.innerText = "Workouts";
+  display.innerHTML = "<p>Bitte wähle ein Workout aus</p>";
+  return;
+}
 
   let exercises = workouts[selected];
+  let doneCount = Object.keys(currentSession).length;
+  let total = exercises.length;
 
-  let display = document.getElementById("workoutDisplay");
+  title.innerText = `${selected} 💪 (${doneCount}/${total})`;
   display.innerHTML = "";
 
   exercises.forEach((ex, index) => {
     let li = document.createElement("li");
 
-    // 🔥 HIER rein
     let done = currentSession[ex.name] ? "✅" : "";
 
     li.innerHTML = `
-      ${done} ${ex.name} (${ex.sets}x${ex.reps})
+      ${done} ${ex.name} (${ex.sets}x${ex.reps} - ${ex.weight}kg)
       <button onclick="startExercise(${index})">Start</button>
     `;
 
     display.appendChild(li);
   });
 
+  // 👇 Finish Button
   let finishBtn = document.createElement("button");
   finishBtn.innerText = "Workout beenden";
   finishBtn.onclick = finishWorkout;
@@ -37,8 +79,9 @@ function loadWorkout() {
 }
 
 
-
+// ✅ Übung starten
 function startExercise(index) {
+  document.getElementById("workoutSelect").style.display = "none";
   let workouts = getWorkouts();
   let selected = document.getElementById("workoutSelect").value;
   let exercise = workouts[selected][index];
@@ -55,7 +98,7 @@ function startExercise(index) {
   }
 
   display.innerHTML = `
-    <h3>${exercise.name}</h3>
+    <h3>${exercise.name} ${exercise.weight}kg</h3>
     <p>Ziel: ${exercise.sets}x${exercise.reps}</p>
 
     ${inputs}
@@ -66,6 +109,7 @@ function startExercise(index) {
 }
 
 
+// ✅ Übung speichern
 function saveExercise(index) {
   let workouts = getWorkouts();
   let selected = document.getElementById("workoutSelect").value;
@@ -74,21 +118,22 @@ function saveExercise(index) {
   let results = [];
 
   for (let i = 0; i < exercise.sets; i++) {
-   
     let value = document.getElementById(`set_${i}`).value;
 
-if (!value) value = 0;
+    if (!value) value = 0;
 
-results.push(Number(value));
+    results.push(Number(value));
   }
 
   currentSession[exercise.name] = results;
 
-  alert("Übung gespeichert!");
+  alert("Stabil Bro!");
 
-  loadWorkout(); // zurück zur Liste
+  loadWorkout();
 }
 
+
+// ✅ Workout beenden
 function finishWorkout() {
   if (Object.keys(currentSession).length === 0) {
     alert("Du hast keine Übungen gemacht!");
@@ -104,29 +149,19 @@ function finishWorkout() {
 
   localStorage.setItem("history", JSON.stringify(history));
 
-  alert("Workout gespeichert 💪");
+  alert("Maschine brutal getraininert 💪");
 
   currentSession = {};
-  loadWorkout(); // 🔥 UI reset (empfohlen)
+
+  // 👇 NEU
+  document.getElementById("workoutSelect").value = "";
+  document.getElementById("workoutSelect").style.display = "";
+  loadWorkout(); // reset UI
 }
 
 
-function loadWorkoutList() {
-  let workouts = getWorkouts();
-  let select = document.getElementById("workoutSelect");
-
-  if (!select) return;
-
-  select.innerHTML = "";
-
-  for (let name in workouts) {
-    let option = document.createElement("option");
-    option.value = name;
-    option.text = name;
-    select.appendChild(option);
-  }
-}
-
-window.onload = function() {
+// ✅ Initial laden
+window.onload = function () {
   loadWorkoutList();
+  loadWorkout(); // 👈 sorgt für "Bitte wählen" Anzeige
 };
