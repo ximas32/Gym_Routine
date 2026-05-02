@@ -1,10 +1,13 @@
-// 🔥 UI aufbauen
 document.getElementById("workoutPage").innerHTML = `
   <h3 id="workoutTitle">Workouts</h3>
-  <select id="workoutSelect" onchange="loadWorkout()"></select>
-  <ul id="workoutDisplay"></ul>
-`;
 
+  <select id="workoutSelect" onchange="loadWorkout()"></select>
+
+  <ul id="workoutDisplay"></ul>
+
+  <!-- 🔥 Toast -->
+  <div id="toast"></div>
+`;
 // 🔥 aktuelle Session
 let currentSession = {};
 
@@ -109,7 +112,6 @@ function startExercise(index) {
 }
 
 
-// ✅ Übung speichern
 function saveExercise(index) {
   let workouts = getWorkouts();
   let selected = document.getElementById("workoutSelect").value;
@@ -117,6 +119,7 @@ function saveExercise(index) {
 
   let results = [];
 
+  // 👇 ZUERST Werte sammeln
   for (let i = 0; i < exercise.sets; i++) {
     let value = document.getElementById(`set_${i}`).value;
 
@@ -125,26 +128,65 @@ function saveExercise(index) {
     results.push(Number(value));
   }
 
+  // 👇 DANACH prüfen
+  let targetReached = results.every(r => r >= exercise.reps);
+
+
+
+if (targetReached) {
+  showToast("Stabil Bro! Weiter so!!");
+
+  let newWeight = prompt(
+    `Ziel erreicht 💪\nAktuelles Gewicht: ${exercise.weight}kg\nNeues Gewicht eingeben:`,
+    exercise.weight
+  );
+
+  if (newWeight !== null && !isNaN(newWeight)) {
+    exercise.weight = Number(newWeight);
+
+    workouts[selected][index] = exercise;
+    saveWorkouts(workouts);
+  }
+
+} else {
+  showToast("Stabil Bro!");
+}
+
   currentSession[exercise.name] = results;
 
-  alert("Stabil Bro!");
+
 
   loadWorkout();
 }
-
-
-// ✅ Workout beenden
 function finishWorkout() {
   if (Object.keys(currentSession).length === 0) {
     alert("Du hast keine Übungen gemacht!");
     return;
   }
 
+ 
+let selected = document.getElementById("workoutSelect").value;
+
+if (!selected) {
+  alert("Kein Workout ausgewählt!");
+  return;
+}
   let history = JSON.parse(localStorage.getItem("history")) || [];
+
+  let workoutData = getWorkouts()[selected];
+
+  let sessionData = {};
+
+  workoutData.forEach(ex => {
+    sessionData[ex.name] = {
+      reps: currentSession[ex.name] || [],
+      weight: ex.weight
+    };
+  });
 
   history.push({
     date: new Date().toLocaleString(),
-    data: currentSession
+    data: sessionData
   });
 
   localStorage.setItem("history", JSON.stringify(history));
@@ -153,15 +195,13 @@ function finishWorkout() {
 
   currentSession = {};
 
-  // 👇 NEU
   document.getElementById("workoutSelect").value = "";
   document.getElementById("workoutSelect").style.display = "";
-  loadWorkout(); // reset UI
+  loadWorkout();
 }
 
-
 // ✅ Initial laden
-window.onload = function () {
+window.addEventListener("load", function () {
   loadWorkoutList();
-  loadWorkout(); // 👈 sorgt für "Bitte wählen" Anzeige
-};
+  loadWorkout();
+});
