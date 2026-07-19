@@ -1,6 +1,6 @@
 // 🔧 Bei jeder Änderung an der App die Versionsnummer erhöhen,
 // damit installierte PWAs das Update bekommen!
-const CACHE = "gym-routine-v5";
+const CACHE = "gym-routine-v6";
 
 const ASSETS = [
   "./",
@@ -15,6 +15,7 @@ const ASSETS = [
   "./workout.js",
   "./share.js",
   "./progress.js",
+  "./stats.js",
   "./app.js",
   "./manifest.json",
   "./icons/icon-192.png",

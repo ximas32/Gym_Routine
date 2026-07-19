@@ -74,7 +74,32 @@ function exportData() {
   a.download = `gym-backup-${new Date().toISOString().slice(0, 10)}.json`;
   a.click();
   URL.revokeObjectURL(a.href);
+
+  localStorage.setItem("lastBackup", Date.now());
 }
+
+// 💾 Erinnerung: alle 14 Tage ans Backup denken (nervt max. alle 3 Tage)
+function checkBackupReminder() {
+  if (getHistory().length === 0) return;
+
+  let lastBackup = Number(localStorage.getItem("lastBackup")) || 0;
+  let lastReminder = Number(localStorage.getItem("lastBackupReminder")) || 0;
+  let now = Date.now();
+
+  const DAY = 86400000;
+  if (now - lastBackup < 14 * DAY) return;
+  if (now - lastReminder < 3 * DAY) return;
+
+  localStorage.setItem("lastBackupReminder", now);
+
+  let msg = lastBackup
+    ? `Dein letztes Backup ist ${Math.round((now - lastBackup) / DAY)} Tage her.\nJetzt Backup exportieren?`
+    : "Du hast noch nie ein Backup exportiert.\nJetzt eins erstellen?";
+
+  if (confirm(msg)) exportData();
+}
+
+window.addEventListener("load", () => setTimeout(checkBackupReminder, 2000));
 
 // 💾 Backup aus JSON-Datei einlesen
 function importData(event) {

@@ -110,6 +110,22 @@ function startExercise(index) {
 
   let display = document.getElementById("workoutDisplay");
 
+  // 👇 letzte Werte dieser Übung aus der History suchen
+  let history = getHistory();
+  let last = null;
+
+  for (let i = history.length - 1; i >= 0; i--) {
+    let data = history[i].data && history[i].data[exercise.name];
+    if (data && data.reps && data.reps.length > 0) {
+      last = { reps: data.reps, weight: data.weight, date: history[i].date };
+      break;
+    }
+  }
+
+  let lastLine = last
+    ? `<p class="last-values">Letztes Mal (${formatDate(last.date)}): <b>${last.reps.join(" / ")}</b> @ ${last.weight}kg</p>`
+    : "";
+
   let inputs = "";
 
   for (let i = 0; i < exercise.sets; i++) {
@@ -122,6 +138,7 @@ function startExercise(index) {
   display.innerHTML = `
     <h3>${escapeHtml(exercise.name)} ${exercise.weight}kg</h3>
     <p>Ziel: ${exercise.sets}x${exercise.reps}</p>
+    ${lastLine}
 
     ${inputs}
 

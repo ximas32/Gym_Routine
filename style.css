@@ -164,6 +164,78 @@ li button {
   font-size: 15px;
 }
 
+/* 📊 Statistik */
+#statTiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 12px 0 20px;
+}
+
+.stat-tile {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 10px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.log-entry {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin: 8px 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.log-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.log-count {
+  color: var(--muted);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.log-details {
+  display: none;
+  margin-top: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.log-entry.open .log-details {
+  display: block;
+}
+
+.log-exercise {
+  font-size: 14px;
+  color: var(--muted);
+  padding: 3px 0;
+}
+
+.last-values {
+  color: var(--accent2);
+  font-size: 14px;
+}
+
 /* 📤 Teilen */
 #workoutSelectRow {
   display: flex;
