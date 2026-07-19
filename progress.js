@@ -26,8 +26,10 @@ let chartOneRM = [];
 
 // 🔹 Übungen laden
 function loadExerciseList() {
-  let history = JSON.parse(localStorage.getItem("history")) || [];
+  let history = getHistory();
   let select = document.getElementById("exerciseSelect");
+
+  let previous = select.value;
 
   select.innerHTML = "";
 
@@ -45,12 +47,17 @@ function loadExerciseList() {
     option.text = name;
     select.appendChild(option);
   });
+
+  // 👇 vorherige Auswahl wiederherstellen
+  if (previous && exercises.has(previous)) {
+    select.value = previous;
+  }
 }
 
 
 // 🔹 Progress laden
 function loadProgress() {
-  let history = JSON.parse(localStorage.getItem("history")) || [];
+  let history = getHistory();
   let selected = document.getElementById("exerciseSelect").value;
 
   let dataPoints = [];
@@ -84,7 +91,7 @@ function loadProgress() {
   dates.forEach((date, i) => {
     let option = document.createElement("option");
     option.value = i;
-    option.text = new Date(date).toLocaleDateString();
+    option.text = formatDate(date); // 🔧 robust, kein "Invalid Date" mehr
     sessionSelect.appendChild(option);
   });
 }
@@ -237,9 +244,7 @@ function highlightPoint() {
   ctx.fill();
 
   // 🔥 Info anzeigen
-  let date = new Date(chartDates[index]);
-
-let formattedDate = date.toLocaleDateString();
+let formattedDate = formatDate(chartDates[index]); // 🔧 robust, kein "Invalid Date" mehr
 
 let info = document.getElementById("sessionInfo");
 info.innerText = `${value}kg — ${formattedDate}`;
@@ -249,4 +254,5 @@ info.innerText = `${value}kg — ${formattedDate}`;
 // 🔹 Init
 window.addEventListener("load", function () {
   loadExerciseList();
+  loadProgress(); // 👇 Chart direkt für die erste Übung zeichnen
 });

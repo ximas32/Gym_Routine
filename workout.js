@@ -8,16 +8,20 @@ document.getElementById("workoutPage").innerHTML = `
   <!-- 🔥 Toast -->
   <div id="toast"></div>
 `;
-// 🔥 aktuelle Session
+
+// 🔥 aktuelle Session (Key = Übungs-Index, damit gleiche Namen nicht kollidieren)
 let currentSession = {};
+let currentSessionWorkout = "";
 
 
-// ✅ Dropdown laden
+// ✅ Dropdown laden (Auswahl bleibt erhalten)
 function loadWorkoutList() {
   let workouts = getWorkouts();
   let select = document.getElementById("workoutSelect");
 
   if (!select) return;
+
+  let previous = select.value;
 
   select.innerHTML = "";
 
@@ -36,6 +40,11 @@ function loadWorkoutList() {
     option.text = name;
     select.appendChild(option);
   }
+
+  // 👇 vorherige Auswahl wiederherstellen, falls noch vorhanden
+  if (previous && workouts[previous]) {
+    select.value = previous;
+  }
 }
 
 
@@ -46,12 +55,18 @@ function loadWorkout() {
   let title = document.getElementById("workoutTitle");
   let display = document.getElementById("workoutDisplay");
 
+  // 👇 anderes Workout gewählt → Session zurücksetzen
+  if (selected !== currentSessionWorkout) {
+    currentSession = {};
+    currentSessionWorkout = selected;
+  }
+
   // 👇 nichts gewählt
   if (!selected) {
-  title.innerText = "Workouts";
-  display.innerHTML = "<p>Bitte wähle ein Workout aus</p>";
-  return;
-}
+    title.innerText = "Workouts";
+    display.innerHTML = "<p>Bitte wähle ein Workout aus</p>";
+    return;
+  }
 
   let exercises = workouts[selected];
   let doneCount = Object.keys(currentSession).length;
@@ -63,10 +78,10 @@ function loadWorkout() {
   exercises.forEach((ex, index) => {
     let li = document.createElement("li");
 
-    let done = currentSession[ex.name] ? "✅" : "";
+    let done = currentSession[index] ? "✅" : "";
 
     li.innerHTML = `
-      ${done} ${ex.name} (${ex.sets}x${ex.reps} - ${ex.weight}kg)
+      ${done} ${escapeHtml(ex.name)} (${ex.sets}x${ex.reps} - ${ex.weight}kg)
       <button onclick="startExercise(${index})">Start</button>
     `;
 
@@ -95,20 +110,26 @@ function startExercise(index) {
 
   for (let i = 0; i < exercise.sets; i++) {
     inputs += `
-      Satz ${i + 1}: 
-      <input type="number" id="set_${i}" placeholder="Reps"><br>
+      Satz ${i + 1}:
+      <input type="number" id="set_${i}" min="0" placeholder="Reps"><br>
     `;
   }
 
   display.innerHTML = `
-    <h3>${exercise.name} ${exercise.weight}kg</h3>
+    <h3>${escapeHtml(exercise.name)} ${exercise.weight}kg</h3>
     <p>Ziel: ${exercise.sets}x${exercise.reps}</p>
 
     ${inputs}
 
     <button onclick="saveExercise(${index})">Speichern</button>
-    <button onclick="loadWorkout()">Zurück</button>
+    <button onclick="backToWorkout()">Zurück</button>
   `;
+}
+
+// ✅ Zurück zur Übersicht (Dropdown wieder einblenden)
+function backToWorkout() {
+  document.getElementById("workoutSelect").style.display = "";
+  loadWorkout();
 }
 
 
@@ -121,79 +142,78 @@ function saveExercise(index) {
 
   // 👇 ZUERST Werte sammeln
   for (let i = 0; i < exercise.sets; i++) {
-    let value = document.getElementById(`set_${i}`).value;
+    let value = Number(document.getElementById(`set_${i}`).value);
 
-    if (!value) value = 0;
+    if (isNaN(value) || value < 0) value = 0;
 
-    results.push(Number(value));
+    results.push(value);
   }
 
   // 👇 DANACH prüfen
   let targetReached = results.every(r => r >= exercise.reps);
 
+  if (targetReached) {
+    showToast("Stabil Bro! Weiter so!!");
 
+    let newWeight = prompt(
+      `Ziel erreicht 💪\nAktuelles Gewicht: ${exercise.weight}kg\nNeues Gewicht eingeben:`,
+      exercise.weight
+    );
 
-if (targetReached) {
-  showToast("Stabil Bro! Weiter so!!");
+    if (newWeight !== null && newWeight.trim() !== "" && !isNaN(Number(newWeight)) && Number(newWeight) >= 0) {
+      exercise.weight = Number(newWeight);
 
-  let newWeight = prompt(
-    `Ziel erreicht 💪\nAktuelles Gewicht: ${exercise.weight}kg\nNeues Gewicht eingeben:`,
-    exercise.weight
-  );
+      workouts[selected][index] = exercise;
+      saveWorkouts(workouts);
+    }
 
-  if (newWeight !== null && !isNaN(newWeight)) {
-    exercise.weight = Number(newWeight);
-
-    workouts[selected][index] = exercise;
-    saveWorkouts(workouts);
+  } else {
+    showToast("Stabil Bro!");
   }
 
-} else {
-  showToast("Stabil Bro!");
+  currentSession[index] = results;
+
+  backToWorkout();
 }
 
-  currentSession[exercise.name] = results;
-
-
-
-  loadWorkout();
-}
 function finishWorkout() {
   if (Object.keys(currentSession).length === 0) {
     alert("Du hast keine Übungen gemacht!");
     return;
   }
 
- 
-let selected = document.getElementById("workoutSelect").value;
+  let selected = document.getElementById("workoutSelect").value;
 
-if (!selected) {
-  alert("Kein Workout ausgewählt!");
-  return;
-}
-  let history = JSON.parse(localStorage.getItem("history")) || [];
+  if (!selected) {
+    alert("Kein Workout ausgewählt!");
+    return;
+  }
+
+  let history = getHistory();
 
   let workoutData = getWorkouts()[selected];
 
   let sessionData = {};
 
-  workoutData.forEach(ex => {
+  workoutData.forEach((ex, index) => {
     sessionData[ex.name] = {
-      reps: currentSession[ex.name] || [],
+      reps: currentSession[index] || [],
       weight: ex.weight
     };
   });
 
   history.push({
-    date: new Date().toLocaleString(),
+    date: new Date().toISOString(), // 🔧 ISO statt toLocaleString → Chart kann es parsen
+    workout: selected,
     data: sessionData
   });
 
-  localStorage.setItem("history", JSON.stringify(history));
+  saveHistory(history);
 
   alert("Maschine brutal getraininert 💪");
 
   currentSession = {};
+  currentSessionWorkout = "";
 
   document.getElementById("workoutSelect").value = "";
   document.getElementById("workoutSelect").style.display = "";

@@ -21,6 +21,15 @@
 <div id="workoutPage" class="hidden"></div>
 <div id="progressPage" class="hidden"></div>
 
+<hr>
+
+<!-- 💾 Backup -->
+<div id="dataBar">
+  <button onclick="exportData()">Backup exportieren</button>
+  <button onclick="document.getElementById('importFile').click()">Backup importieren</button>
+  <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
+</div>
+
 <script src="storage.js"></script>
 <script src="create.js"></script>
 <script src="edit.js"></script>

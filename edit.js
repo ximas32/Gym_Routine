@@ -1,23 +1,27 @@
-
-
-
 function addExerciseToWorkout() {
+  let selected = document.getElementById("editSelect").value;
+
+  if (!selected) {
+    alert("Bitte zuerst ein Workout auswählen!");
+    return;
+  }
+
   let list = document.getElementById("editList");
 
- list.innerHTML = `
+  list.innerHTML = `
   <h4>Neue Übung</h4>
 
   <label>Übung</label><br>
   <input id="new_name"><br>
 
   <label>Sätze</label><br>
-  <input id="new_sets"><br>
+  <input id="new_sets" type="number" min="1"><br>
 
   <label>Reps</label><br>
-  <input id="new_reps"><br>
+  <input id="new_reps" type="number" min="1"><br>
 
   <label>Gewicht</label><br>
-  <input id="new_weight"><br><br>
+  <input id="new_weight" type="number" min="0" step="0.5"><br><br>
 
   <button onclick="saveNewExercise()">Speichern</button>
   <button onclick="loadEditWorkout()">Zurück</button>
@@ -29,14 +33,16 @@ function saveNewExercise() {
   let workouts = getWorkouts();
 
   let newExercise = {
-    name: document.getElementById("new_name").value,
+    name: document.getElementById("new_name").value.trim(),
     sets: Number(document.getElementById("new_sets").value),
     reps: Number(document.getElementById("new_reps").value),
     weight: Number(document.getElementById("new_weight").value)
   };
 
-  if (!newExercise.name) {
-    alert("Bitte Übungsname eingeben!");
+  // ✅ Eingaben prüfen
+  let error = validateExercise(newExercise.name, newExercise.sets, newExercise.reps, newExercise.weight);
+  if (error) {
+    alert(error);
     return;
   }
 
@@ -49,7 +55,6 @@ function saveNewExercise() {
 
   loadEditWorkout();
 }
-
 
 
 function deleteWorkout() {
@@ -73,6 +78,7 @@ function deleteWorkout() {
   alert("Workout gelöscht!");
 
   showEditMode(); // 🔥 UI neu laden
+  loadWorkoutList(); // 🔥 Workout-Dropdown aktualisieren
 }
 
 function deleteExercise(index) {
@@ -90,20 +96,25 @@ function deleteExercise(index) {
 }
 
 
-
-
-
-
 function saveEditExercise(index) {
   let selected = document.getElementById("editSelect").value;
   let workouts = getWorkouts();
 
-  currentExercises[index] = {
-    name: document.getElementById("edit_name").value,
+  let updated = {
+    name: document.getElementById("edit_name").value.trim(),
     sets: Number(document.getElementById("edit_sets").value),
     reps: Number(document.getElementById("edit_reps").value),
     weight: Number(document.getElementById("edit_weight").value)
-    };
+  };
+
+  // ✅ Eingaben prüfen
+  let error = validateExercise(updated.name, updated.sets, updated.reps, updated.weight);
+  if (error) {
+    alert(error);
+    return;
+  }
+
+  currentExercises[index] = updated;
 
   workouts[selected] = currentExercises;
   saveWorkouts(workouts);
@@ -122,7 +133,7 @@ function showEditMode() {
 
   let options = "";
   for (let name in workouts) {
-    options += `<option value="${name}">${name}</option>`;
+    options += `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`;
   }
 
   document.getElementById("editMode").innerHTML = `
@@ -150,16 +161,16 @@ function openEditExercise(index) {
   <h4>Übung bearbeiten</h4>
 
   <label>Übung</label><br>
-  <input id="edit_name" value="${ex.name}"><br>
+  <input id="edit_name" value="${escapeHtml(ex.name)}"><br>
 
   <label>Sätze</label><br>
-  <input id="edit_sets" value="${ex.sets}"><br>
+  <input id="edit_sets" type="number" min="1" value="${ex.sets}"><br>
 
   <label>Reps</label><br>
-  <input id="edit_reps" value="${ex.reps}"><br>
+  <input id="edit_reps" type="number" min="1" value="${ex.reps}"><br>
 
   <label>Gewicht</label><br>
-  <input id="edit_weight" value="${ex.weight}"><br><br>
+  <input id="edit_weight" type="number" min="0" step="0.5" value="${ex.weight}"><br><br>
 
   <button onclick="saveEditExercise(${index})">Speichern</button>
   <button onclick="loadEditWorkout()">Zurück</button>
@@ -171,7 +182,10 @@ function loadEditWorkout() {
   let workouts = getWorkouts();
   let selected = document.getElementById("editSelect").value;
 
-  if (!selected) return;
+  if (!selected) {
+    document.getElementById("editList").innerHTML = "";
+    return;
+  }
 
   currentExercises = workouts[selected];
 
@@ -182,7 +196,7 @@ function loadEditWorkout() {
     let li = document.createElement("li");
 
     li.innerHTML = `
-  ${ex.name} – ${ex.sets}x${ex.reps} (${ex.weight}kg)
+  ${escapeHtml(ex.name)} – ${ex.sets}x${ex.reps} (${ex.weight}kg)
 
   <button onclick="openEditExercise(${index})">Bearbeiten</button>
   <button onclick="deleteExercise(${index})">Löschen</button>
