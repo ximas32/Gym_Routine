@@ -175,7 +175,8 @@ li button {
   flex: 1;
 }
 
-#shareBtn {
+#shareBtn,
+#importBtn {
   margin: 0;
   padding: 10px 14px;
   flex-shrink: 0;

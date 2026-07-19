@@ -66,20 +66,18 @@ async function shareWorkout() {
   }
 }
 
-// 🔹 Beim Öffnen prüfen, ob ein geteiltes Workout im Link steckt
-function checkSharedWorkout() {
-  if (!location.hash.startsWith("#w=")) return;
-
-  let code = location.hash.slice(3);
-
-  // Hash aus der URL entfernen (sonst importiert jeder Reload erneut)
-  history.replaceState(null, "", location.pathname + location.search);
+// 🔹 Code (oder ganzer Link) → Workout importieren
+function importWorkoutFromCode(code) {
+  // falls ein ganzer Link eingefügt wurde: Code dahinter rausziehen
+  let match = /#w=([A-Za-z0-9_-]+)/.exec(code);
+  if (match) code = match[1];
+  code = code.trim();
 
   let shared;
   try {
     shared = decodeWorkout(code);
   } catch {
-    alert("Der geteilte Link ist ungültig!");
+    alert("Der Link/Code ist ungültig!");
     return;
   }
 
@@ -104,6 +102,27 @@ function checkSharedWorkout() {
   loadWorkout();
 
   showToast("Workout importiert! 💪");
+}
+
+// 🔹 📥 In der App: Link einfügen und importieren
+// (wichtig für iOS: Die installierte App und Safari haben getrennte Speicher —
+//  ein im Browser geöffneter Link landet sonst nicht in der App)
+function importSharedWorkout() {
+  let text = prompt("Geteilten Link (oder Code) hier einfügen:");
+  if (!text) return;
+  importWorkoutFromCode(text);
+}
+
+// 🔹 Beim Öffnen prüfen, ob ein geteiltes Workout im Link steckt
+function checkSharedWorkout() {
+  if (!location.hash.startsWith("#w=")) return;
+
+  let code = location.hash.slice(3);
+
+  // Hash aus der URL entfernen (sonst importiert jeder Reload erneut)
+  history.replaceState(null, "", location.pathname + location.search);
+
+  importWorkoutFromCode(code);
 }
 
 window.addEventListener("load", checkSharedWorkout);

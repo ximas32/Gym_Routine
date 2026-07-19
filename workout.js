@@ -4,6 +4,7 @@ document.getElementById("workoutPage").innerHTML = `
   <div id="workoutSelectRow">
     <select id="workoutSelect" onchange="loadWorkout()"></select>
     <button id="shareBtn" onclick="shareWorkout()" title="Workout teilen">📤</button>
+    <button id="importBtn" onclick="importSharedWorkout()" title="Geteiltes Workout importieren">📥</button>
   </div>
 
   <ul id="workoutDisplay"></ul>
