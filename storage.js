@@ -1,3 +1,7 @@
+// 💾 storage.js — zentrale Helfer für alle anderen Dateien
+// localStorage-Zugriff, HTML-Escaping, Validierung, Datums-Migration und Backup.
+// Wird als erstes Script geladen, damit die Funktionen überall verfügbar sind.
+
 function getWorkouts() {
   return JSON.parse(localStorage.getItem("workouts")) || {};
 }

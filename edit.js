@@ -1,3 +1,9 @@
+// ✏️ edit.js — bestehende Workouts bearbeiten
+// Ablauf: showEditMode() → Workout wählen → loadEditWorkout() zeigt die Übungen.
+// Jede Änderung (hinzufügen/bearbeiten/löschen) speichert sofort in localStorage.
+// currentExercises (aus create.js) hält dabei die Übungen des gewählten Workouts.
+
+// 🔹 Formular für eine neue Übung im gewählten Workout
 function addExerciseToWorkout() {
   let selected = document.getElementById("editSelect").value;
 
@@ -28,6 +34,7 @@ function addExerciseToWorkout() {
 `;
 }
 
+// 🔹 neue Übung validieren und ans Workout anhängen
 function saveNewExercise() {
   let selected = document.getElementById("editSelect").value;
   let workouts = getWorkouts();
@@ -57,6 +64,7 @@ function saveNewExercise() {
 }
 
 
+// 🔹 komplettes Workout löschen (mit Rückfrage)
 function deleteWorkout() {
   let selected = document.getElementById("editSelect").value;
 
@@ -81,6 +89,7 @@ function deleteWorkout() {
   loadWorkoutList(); // 🔥 Workout-Dropdown aktualisieren
 }
 
+// 🔹 einzelne Übung aus dem Workout entfernen
 function deleteExercise(index) {
   let selected = document.getElementById("editSelect").value;
   let workouts = getWorkouts();
@@ -96,6 +105,7 @@ function deleteExercise(index) {
 }
 
 
+// 🔹 bearbeitete Übung validieren und zurückschreiben
 function saveEditExercise(index) {
   let selected = document.getElementById("editSelect").value;
   let workouts = getWorkouts();
@@ -125,6 +135,7 @@ function saveEditExercise(index) {
 }
 
 
+// 🔹 Bearbeiten-Modus anzeigen: Dropdown mit allen Workouts
 function showEditMode() {
   document.getElementById("editMode").classList.remove("hidden");
   document.getElementById("createMode").classList.add("hidden");
@@ -152,6 +163,7 @@ function showEditMode() {
 `;
 }
 
+// 🔹 Formular mit den Werten einer Übung vorbefüllen
 function openEditExercise(index) {
   let ex = currentExercises[index];
 
@@ -178,6 +190,7 @@ function openEditExercise(index) {
 }
 
 
+// 🔹 Übungsliste des gewählten Workouts anzeigen
 function loadEditWorkout() {
   let workouts = getWorkouts();
   let selected = document.getElementById("editSelect").value;

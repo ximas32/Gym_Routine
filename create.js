@@ -1,5 +1,10 @@
+// 📝 create.js — neues Workout anlegen
+// currentExercises sammelt die Übungen, bis "Speichern" gedrückt wird.
+// (edit.js nutzt dieselbe Variable beim Bearbeiten eines bestehenden Workouts.)
+
 let currentExercises = [];
 
+// Grundgerüst der Erstellen-Seite: zwei Modi (neu / bearbeiten)
 document.getElementById("createPage").innerHTML = `
   <h3>Workout</h3>
 
@@ -10,6 +15,7 @@ document.getElementById("createPage").innerHTML = `
   <div id="editMode" class="hidden"></div>
 `;
 
+// 🔹 Formular für ein neues Workout anzeigen
 function showCreateMode() {
   document.getElementById("createMode").classList.remove("hidden");
   document.getElementById("editMode").classList.add("hidden");
@@ -42,6 +48,7 @@ function showCreateMode() {
 `;
 }
 
+// 🔹 Übung aus den Eingabefeldern in die Liste übernehmen
 function addExercise() {
   let name = document.getElementById("exerciseName").value.trim();
   let sets = Number(document.getElementById("sets").value);
@@ -69,6 +76,7 @@ function addExercise() {
   document.getElementById("exerciseName").focus();
 }
 
+// 🔹 Workout unter seinem Namen in localStorage ablegen
 function saveWorkout() {
   let name = document.getElementById("workoutName").value.trim();
 

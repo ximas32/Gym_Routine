@@ -1,3 +1,8 @@
+// 🏋️ workout.js — Training durchführen
+// Ablauf: Workout wählen → pro Übung "Start" → Reps je Satz eintragen → Speichern.
+// Bei erreichtem Ziel schlägt die App eine Gewichtserhöhung vor (progressive Overload).
+// "Workout beenden" schreibt die Session in die History (Grundlage für Charts & Punkte).
+
 document.getElementById("workoutPage").innerHTML = `
   <h3 id="workoutTitle">Workouts</h3>
 

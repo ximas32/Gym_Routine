@@ -1,6 +1,11 @@
+// ⚙️ sw.js — Service Worker: macht die App offline-fähig
+// Strategie: beim Installieren alle App-Dateien vorab cachen (ASSETS),
+// bei jedem Abruf zuerst das Netz fragen (Updates!) und nur offline
+// auf den Cache zurückfallen. Externe Anfragen (Übungsbilder) bleiben unangetastet.
+//
 // 🔧 Bei jeder Änderung an der App die Versionsnummer erhöhen,
 // damit installierte PWAs das Update bekommen!
-const CACHE = "gym-routine-v7";
+const CACHE = "gym-routine-v8";
 
 const ASSETS = [
   "./",

@@ -1,3 +1,7 @@
+// 🧭 app.js — Seiten-Umschaltung (Tabs) + PWA-Grundfunktionen
+// Jede "Seite" ist ein <div> in index.html; showPage() blendet die richtige ein
+// und lädt ihre Daten neu, damit nach einem Training nichts Veraltetes steht.
+
 // 📱 Service Worker registrieren (funktioniert nur über HTTPS / localhost)
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   navigator.serviceWorker.register("sw.js");

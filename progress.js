@@ -1,3 +1,8 @@
+// 📈 progress.js — Fortschritts-Chart pro Übung
+// Zeichnet zwei Linien auf ein Canvas: Trainingsgewicht (blau) und geschätztes
+// 1RM nach Epley (rot). Datenquelle ist die History; über das Session-Dropdown
+// lässt sich ein einzelner Punkt hervorheben.
+
 // 🔥 UI
 document.getElementById("progressPage").innerHTML = `
   <h3>Progress</h3>
