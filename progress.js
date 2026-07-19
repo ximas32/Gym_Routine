@@ -105,6 +105,8 @@ function drawChart(data, oneRMData) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (data.length === 0) {
+    ctx.fillStyle = "#9a9aa8";
+    ctx.font = "14px Arial";
     ctx.fillText("Keine Daten vorhanden", 80, 100);
     return;
   }
@@ -133,13 +135,13 @@ function drawChart(data, oneRMData) {
 
     // Grid
     ctx.beginPath();
-    ctx.strokeStyle = "#ddd";
+    ctx.strokeStyle = "#33333f";
     ctx.moveTo(padding, y);
     ctx.lineTo(canvas.width - padding, y);
     ctx.stroke();
 
     // Label
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "#9a9aa8";
     ctx.font = "12px Arial";
     ctx.fillText(value.toFixed(0) + "kg", 0, y + 4);
   }
@@ -156,7 +158,7 @@ function drawChart(data, oneRMData) {
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   });
-  ctx.strokeStyle = "blue";
+  ctx.strokeStyle = "#4da3ff";
   ctx.lineWidth = 2;
   ctx.stroke();
 
@@ -172,11 +174,12 @@ function drawChart(data, oneRMData) {
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   });
-  ctx.strokeStyle = "red";
+  ctx.strokeStyle = "#ff6b6b";
   ctx.lineWidth = 2;
   ctx.stroke();
 
   // 🔹 Punkte
+  ctx.fillStyle = "#4da3ff";
   data.forEach((value, i) => {
     let x = padding + i * stepX;
     let y =
@@ -188,14 +191,14 @@ function drawChart(data, oneRMData) {
   });
 
   // 🔹 Legende
-  ctx.fillStyle = "blue";
+  ctx.fillStyle = "#4da3ff";
   ctx.fillText("Gewicht", canvas.width - 100, 20);
 
-  ctx.fillStyle = "red";
+  ctx.fillStyle = "#ff6b6b";
   ctx.fillText("1RM", canvas.width - 100, 40);
 
   // 🔥 Achsen
-  ctx.strokeStyle = "black";
+  ctx.strokeStyle = "#6a6a78";
 
   ctx.beginPath();
   ctx.moveTo(padding, padding);
@@ -240,7 +243,7 @@ function highlightPoint() {
   // 🔥 Highlight
   ctx.beginPath();
   ctx.arc(x, y, 6, 0, Math.PI * 2);
-  ctx.fillStyle = "orange";
+  ctx.fillStyle = "#ff6b35";
   ctx.fill();
 
   // 🔥 Info anzeigen

@@ -20,28 +20,29 @@
 </head>
 <body>
 
-<h2>Fitness App</h2>
+<header>
+  <h1>Gym <span>Routine</span></h1>
+</header>
 
-<div>
-  <button onclick="showPage('create')">Workout erstellen</button>
-  <button onclick="showPage('workout')">Workout</button>
-  <button onclick="showPage('progress')">Progress</button>
-</div>
+<main>
+  <div id="createPage" class="hidden"></div>
+  <div id="workoutPage"></div>
+  <div id="progressPage" class="hidden"></div>
 
-<hr>
+  <!-- 💾 Backup -->
+  <div id="dataBar">
+    <button onclick="exportData()">⬇️ Backup exportieren</button>
+    <button onclick="document.getElementById('importFile').click()">⬆️ Backup importieren</button>
+    <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
+  </div>
+</main>
 
-<div id="createPage"></div>
-<div id="workoutPage" class="hidden"></div>
-<div id="progressPage" class="hidden"></div>
-
-<hr>
-
-<!-- 💾 Backup -->
-<div id="dataBar">
-  <button onclick="exportData()">Backup exportieren</button>
-  <button onclick="document.getElementById('importFile').click()">Backup importieren</button>
-  <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
-</div>
+<!-- 📱 Bottom Navigation -->
+<nav id="bottomNav">
+  <button id="nav-create" class="nav-btn" onclick="showPage('create')">📝<span>Erstellen</span></button>
+  <button id="nav-workout" class="nav-btn active" onclick="showPage('workout')">🏋️<span>Workout</span></button>
+  <button id="nav-progress" class="nav-btn" onclick="showPage('progress')">📈<span>Progress</span></button>
+</nav>
 
 <script src="storage.js"></script>
 <script src="create.js"></script>

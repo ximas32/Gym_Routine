@@ -15,6 +15,11 @@ function showPage(page) {
 
   document.getElementById(page + "Page").classList.remove("hidden");
 
+  // 📱 aktiven Tab markieren
+  document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
+  let navBtn = document.getElementById("nav-" + page);
+  if (navBtn) navBtn.classList.add("active");
+
   // 🔄 Seite mit aktuellen Daten neu laden
   if (page === "workout") {
     loadWorkoutList();

@@ -1,6 +1,6 @@
 // 🔧 Bei jeder Änderung an der App die Versionsnummer erhöhen,
 // damit installierte PWAs das Update bekommen!
-const CACHE = "gym-routine-v1";
+const CACHE = "gym-routine-v2";
 
 const ASSETS = [
   "./",
@@ -41,7 +41,8 @@ self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
 
   event.respondWith(
-    fetch(event.request)
+    // "no-cache": immer beim Server nachfragen, damit Updates sofort ankommen
+    fetch(event.request, { cache: "no-cache" })
       .then(response => {
         let copy = response.clone();
         caches.open(CACHE).then(cache => cache.put(event.request, copy));
