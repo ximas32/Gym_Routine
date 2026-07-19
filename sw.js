@@ -1,0 +1,52 @@
+// 🔧 Bei jeder Änderung an der App die Versionsnummer erhöhen,
+// damit installierte PWAs das Update bekommen!
+const CACHE = "gym-routine-v1";
+
+const ASSETS = [
+  "./",
+  "./index.html",
+  "./style.css",
+  "./storage.js",
+  "./create.js",
+  "./edit.js",
+  "./animation.js",
+  "./workout.js",
+  "./progress.js",
+  "./app.js",
+  "./manifest.json",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png"
+];
+
+// Installieren: App-Dateien in den Cache legen
+self.addEventListener("install", event => {
+  event.waitUntil(
+    caches.open(CACHE).then(cache => cache.addAll(ASSETS))
+  );
+  self.skipWaiting();
+});
+
+// Aktivieren: alte Caches aufräumen
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))
+    )
+  );
+  self.clients.claim();
+});
+
+// Netzwerk zuerst (damit Updates ankommen), bei offline aus dem Cache
+self.addEventListener("fetch", event => {
+  if (event.request.method !== "GET") return;
+
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        let copy = response.clone();
+        caches.open(CACHE).then(cache => cache.put(event.request, copy));
+        return response;
+      })
+      .catch(() => caches.match(event.request, { ignoreSearch: true }))
+  );
+});
