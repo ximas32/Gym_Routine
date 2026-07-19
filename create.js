@@ -23,7 +23,7 @@ function showCreateMode() {
   <input id="workoutName"><br><br>
 
   <label>Übung</label><br>
-  <input id="exerciseName"><br>
+  <input id="exerciseName" readonly placeholder="Tippen zum Auswählen 📚" onclick="openExercisePicker('exerciseName')"><br>
 
   <label>Sätze</label><br>
   <input id="sets" type="number" min="1"><br>

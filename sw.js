@@ -1,12 +1,14 @@
 // 🔧 Bei jeder Änderung an der App die Versionsnummer erhöhen,
 // damit installierte PWAs das Update bekommen!
-const CACHE = "gym-routine-v2";
+const CACHE = "gym-routine-v3";
 
 const ASSETS = [
   "./",
   "./index.html",
   "./style.css",
   "./storage.js",
+  "./library.js",
+  "./exercises.json",
   "./create.js",
   "./edit.js",
   "./animation.js",
@@ -39,6 +41,9 @@ self.addEventListener("activate", event => {
 // Netzwerk zuerst (damit Updates ankommen), bei offline aus dem Cache
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
+
+  // Externe Anfragen (z.B. Übungsbilder von GitHub) nicht abfangen
+  if (new URL(event.request.url).origin !== location.origin) return;
 
   event.respondWith(
     // "no-cache": immer beim Server nachfragen, damit Updates sofort ankommen

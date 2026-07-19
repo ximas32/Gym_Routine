@@ -12,7 +12,7 @@ function addExerciseToWorkout() {
   <h4>Neue Übung</h4>
 
   <label>Übung</label><br>
-  <input id="new_name"><br>
+  <input id="new_name" readonly placeholder="Tippen zum Auswählen 📚" onclick="openExercisePicker('new_name')"><br>
 
   <label>Sätze</label><br>
   <input id="new_sets" type="number" min="1"><br>
@@ -161,7 +161,7 @@ function openEditExercise(index) {
   <h4>Übung bearbeiten</h4>
 
   <label>Übung</label><br>
-  <input id="edit_name" value="${escapeHtml(ex.name)}"><br>
+  <input id="edit_name" readonly onclick="openExercisePicker('edit_name')" value="${escapeHtml(ex.name)}"><br>
 
   <label>Sätze</label><br>
   <input id="edit_sets" type="number" min="1" value="${ex.sets}"><br>
