@@ -162,7 +162,7 @@ function showExerciseInfo(name) {
 
   let steps = ex.instructions.map(step => `<li>${escapeHtml(step)}</li>`).join("");
 
-  let ytQuery = encodeURIComponent(ex.name + " exercise form");
+  let ytQuery = encodeURIComponent(ex.name + " gym exercise");
 
   info.innerHTML = `
     <button class="picker-back" onclick="renderPickerList()">← Zurück zur Liste</button>

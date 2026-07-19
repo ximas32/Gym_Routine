@@ -164,6 +164,23 @@ li button {
   font-size: 15px;
 }
 
+/* 📤 Teilen */
+#workoutSelectRow {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+#workoutSelectRow select {
+  flex: 1;
+}
+
+#shareBtn {
+  margin: 0;
+  padding: 10px 14px;
+  flex-shrink: 0;
+}
+
 /* 💾 Backup */
 #dataBar {
   margin-top: 28px;

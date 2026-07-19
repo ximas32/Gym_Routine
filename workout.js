@@ -1,7 +1,10 @@
 document.getElementById("workoutPage").innerHTML = `
   <h3 id="workoutTitle">Workouts</h3>
 
-  <select id="workoutSelect" onchange="loadWorkout()"></select>
+  <div id="workoutSelectRow">
+    <select id="workoutSelect" onchange="loadWorkout()"></select>
+    <button id="shareBtn" onclick="shareWorkout()" title="Workout teilen">📤</button>
+  </div>
 
   <ul id="workoutDisplay"></ul>
 
@@ -99,7 +102,7 @@ function loadWorkout() {
 
 // ✅ Übung starten
 function startExercise(index) {
-  document.getElementById("workoutSelect").style.display = "none";
+  document.getElementById("workoutSelectRow").style.display = "none";
   let workouts = getWorkouts();
   let selected = document.getElementById("workoutSelect").value;
   let exercise = workouts[selected][index];
@@ -128,7 +131,7 @@ function startExercise(index) {
 
 // ✅ Zurück zur Übersicht (Dropdown wieder einblenden)
 function backToWorkout() {
-  document.getElementById("workoutSelect").style.display = "";
+  document.getElementById("workoutSelectRow").style.display = "";
   loadWorkout();
 }
 
@@ -216,7 +219,7 @@ function finishWorkout() {
   currentSessionWorkout = "";
 
   document.getElementById("workoutSelect").value = "";
-  document.getElementById("workoutSelect").style.display = "";
+  document.getElementById("workoutSelectRow").style.display = "";
   loadWorkout();
 }
 
