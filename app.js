@@ -30,6 +30,7 @@ function showPage(page) {
   if (page === "progress") {
     loadExerciseList();
     loadProgress();
+    renderBodyweight();
   }
 
   if (page === "stats") {

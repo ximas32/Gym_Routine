@@ -219,9 +219,14 @@ function finishWorkout() {
   workoutData.forEach((ex, index) => {
     sessionData[ex.name] = {
       reps: currentSession[index] || [],
-      weight: ex.weight
+      weight: ex.weight,
+      target: ex.reps, // 🏆 Ziel mitspeichern für die Punkteberechnung
+      sets: ex.sets
     };
   });
+
+  // 🏆 Punkte für diese Session = Differenz vorher/nachher
+  let pointsBefore = computePoints(history);
 
   history.push({
     date: new Date().toISOString(), // 🔧 ISO statt toLocaleString → Chart kann es parsen
@@ -229,9 +234,11 @@ function finishWorkout() {
     data: sessionData
   });
 
+  let pointsGained = computePoints(history) - pointsBefore;
+
   saveHistory(history);
 
-  alert("Maschine brutal getraininert 💪");
+  alert(`Maschine brutal getraininert 💪\n+${pointsGained} Punkte! 🏆`);
 
   currentSession = {};
   currentSessionWorkout = "";

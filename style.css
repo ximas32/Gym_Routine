@@ -164,6 +164,120 @@ li button {
   font-size: 15px;
 }
 
+/* 🏆 Level */
+#levelCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin: 12px 0;
+}
+
+.level-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.level-points {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 4px 0 10px;
+}
+
+.level-bar {
+  height: 10px;
+  background: var(--card2);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.level-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #ffa36b);
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+
+.level-next {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+  text-align: right;
+}
+
+/* 🔥 Heatmap */
+#heatmapWrap {
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+#heatmap {
+  display: flex;
+  gap: 3px;
+  width: max-content;
+  margin: 0 auto;
+}
+
+.heat-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.heat-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  background: var(--card2);
+}
+
+.heat-1 {
+  background: #a0522d;
+}
+
+.heat-2 {
+  background: var(--accent);
+}
+
+.heat-future {
+  background: transparent;
+}
+
+/* ⚖️ Körpergewicht */
+#bodyweightSection {
+  margin-top: 28px;
+}
+
+#bwRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+#bwRow input {
+  flex: 1;
+}
+
+#bwRow button {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+#bodyChart {
+  width: 100%;
+  height: auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+#bwInfo {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 8px;
+}
+
 /* 📊 Statistik */
 #statTiles {
   display: grid;

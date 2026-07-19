@@ -2,7 +2,12 @@
 document.getElementById("statsPage").innerHTML = `
   <h3>Statistik</h3>
 
+  <div id="levelCard"></div>
+
   <div id="statTiles"></div>
+
+  <h4>Aktivität (26 Wochen)</h4>
+  <div id="heatmapWrap"><div id="heatmap"></div></div>
 
   <h4>Trainings-Log</h4>
   <div id="trainingLog"></div>
@@ -54,6 +59,19 @@ function loadStats() {
     cursor -= 7 * 86400000;
   }
 
+  // 🏆 Level-Karte
+  let total = computePoints(history);
+  let { level, title, progress } = getLevelInfo(total);
+
+  document.getElementById("levelCard").innerHTML = `
+    <div class="level-title">Level ${level} — ${title}</div>
+    <div class="level-points">${total.toLocaleString("de-CH")} Punkte 🏆</div>
+    <div class="level-bar"><div class="level-fill" style="width:${progress}%"></div></div>
+    <div class="level-next">${100 - progress} Punkte bis Level ${level + 1}</div>
+  `;
+
+  renderHeatmap(history);
+
   document.getElementById("statTiles").innerHTML = `
     <div class="stat-tile">
       <div class="stat-value">${thisWeek.length}</div>
@@ -74,6 +92,59 @@ function loadStats() {
   `;
 
   loadTrainingLog();
+}
+
+// 🔥 Kalender-Heatmap: letzte 26 Wochen, Spalten = Wochen, Zeilen = Mo–So
+function renderHeatmap(history) {
+  // Trainings pro Tag zählen (lokales Datum)
+  let counts = {};
+  history.forEach(h => {
+    let d = new Date(h.date);
+    if (isNaN(d)) return;
+    let key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    counts[key] = (counts[key] || 0) + 1;
+  });
+
+  const WEEKS = 26;
+  let today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let start = new Date(today);
+  start.setDate(today.getDate() - (WEEKS - 1) * 7); // Kalender-Arithmetik (DST-sicher)
+  start = startOfWeek(start);
+
+  let html = "";
+
+  for (let w = 0; w < WEEKS; w++) {
+    html += `<div class="heat-col">`;
+
+    for (let d = 0; d < 7; d++) {
+      // Kalender-Arithmetik statt Millisekunden (sonst verschiebt die Sommerzeit die Tage)
+      let date = new Date(start);
+      date.setDate(start.getDate() + w * 7 + d);
+
+      if (date > today) {
+        html += `<div class="heat-cell heat-future"></div>`;
+        continue;
+      }
+
+      let key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+      let n = counts[key] || 0;
+      let cls = n >= 2 ? "heat-2" : n === 1 ? "heat-1" : "";
+      let label = date.toLocaleDateString("de-CH") + (n ? ` — ${n} Training${n > 1 ? "s" : ""}` : "");
+
+      html += `<div class="heat-cell ${cls}" title="${label}"></div>`;
+    }
+
+    html += `</div>`;
+  }
+
+  let heatmap = document.getElementById("heatmap");
+  heatmap.innerHTML = html;
+
+  // ans Ende scrollen (heute ist rechts)
+  let wrap = document.getElementById("heatmapWrap");
+  wrap.scrollLeft = wrap.scrollWidth;
 }
 
 function loadTrainingLog() {
