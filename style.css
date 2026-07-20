@@ -207,28 +207,31 @@ li button {
   text-align: right;
 }
 
-/* 🔥 Heatmap */
+/* 🔥 Heatmap (chronologisch, ein Block pro Monat) */
 #heatmapWrap {
-  overflow-x: auto;
   padding-bottom: 6px;
 }
 
-#heatmap {
-  display: flex;
-  gap: 3px;
-  width: max-content;
-  margin: 0 auto;
+.heat-month {
+  margin: 0 0 14px;
 }
 
-.heat-col {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+.heat-month-label {
+  text-align: left;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+
+.heat-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
 }
 
 .heat-cell {
-  width: 11px;
-  height: 11px;
+  width: 100%;
+  aspect-ratio: 1;
   border-radius: 3px;
   background: var(--card2);
 }
@@ -646,6 +649,26 @@ input[readonly] {
 
 .settings-actions button {
   flex: 1;
+}
+
+.settings-danger {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.danger-btn {
+  width: 100%;
+  margin: 0;
+  color: #fff;
+  background: #c0392b;
+  border-color: #c0392b;
+}
+
+.danger-hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 8px 0 0;
 }
 
 /* 📱 Bottom Navigation */

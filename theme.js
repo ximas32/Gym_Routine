@@ -82,8 +82,13 @@ document.body.insertAdjacentHTML("beforeend", `
       <div id="presetRow"></div>
 
       <div class="settings-actions">
-        <button onclick="resetTheme()">Zurücksetzen</button>
+        <button onclick="resetTheme()">Farben zurücksetzen</button>
         <button onclick="closeSettings()">Fertig</button>
+      </div>
+
+      <div class="settings-danger">
+        <button class="danger-btn" onclick="resetProgress()">💉 Neustart mit Anabolika</button>
+        <p class="danger-hint">Löscht alle Trainings, Punkte/Level und Körpergewicht. Deine Workouts bleiben.</p>
       </div>
     </div>
   </div>
@@ -130,6 +135,27 @@ function applyPreset(name) {
 
 function resetTheme() {
   applyPreset("Dunkel");
+}
+
+// 💉 Statistik + Progress zurücksetzen (Trainings-History & Körpergewicht löschen).
+// Workouts, eigene Übungen und Farben bleiben erhalten.
+function resetProgress() {
+  let ok = confirm(
+    "💉 Neustart mit Anabolika?\n\n" +
+    "Alle aufgezeichneten Trainings, Punkte/Level und Körpergewichts-Einträge werden gelöscht.\n" +
+    "Deine Workouts bleiben erhalten.\n\n" +
+    "Tipp: Vorher ein Backup exportieren!"
+  );
+  if (!ok) return;
+
+  let sure = confirm("Wirklich alles zurücksetzen? Das kann nicht rückgängig gemacht werden.");
+  if (!sure) return;
+
+  localStorage.removeItem("history");
+  localStorage.removeItem("bodyweight");
+
+  alert("Frisch geduscht, Nadel weg, neu gestartet! 💪");
+  location.reload();
 }
 
 // Sichtbare Canvas-Charts neu zeichnen, damit sie die neuen Farben übernehmen

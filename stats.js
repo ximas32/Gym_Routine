@@ -6,7 +6,7 @@ document.getElementById("statsPage").innerHTML = `
 
   <div id="statTiles"></div>
 
-  <h4>Aktivität (26 Wochen)</h4>
+  <h4>Aktivität (6 Monate)</h4>
   <div id="heatmapWrap"><div id="heatmap"></div></div>
 
   <h4>Trainings-Log</h4>
@@ -61,13 +61,13 @@ function loadStats() {
 
   // 🏆 Level-Karte
   let total = computePoints(history);
-  let { level, title, progress } = getLevelInfo(total);
+  let { level, title, progress, remaining } = getLevelInfo(total);
 
   document.getElementById("levelCard").innerHTML = `
-    <div class="level-title">Level ${level} — ${title}</div>
+    <div class="level-title">Level ${level} — ${escapeHtml(title)}</div>
     <div class="level-points">${total.toLocaleString("de-CH")} Punkte 🏆</div>
     <div class="level-bar"><div class="level-fill" style="width:${progress}%"></div></div>
-    <div class="level-next">${100 - progress} Punkte bis Level ${level + 1}</div>
+    <div class="level-next">${remaining.toLocaleString("de-CH")} Punkte bis Level ${level + 1}</div>
   `;
 
   renderHeatmap(history);
@@ -94,7 +94,8 @@ function loadStats() {
   loadTrainingLog();
 }
 
-// 🔥 Kalender-Heatmap: letzte 26 Wochen, Spalten = Wochen, Zeilen = Mo–So
+// 🔥 Kalender-Heatmap: letzte 6 Monate, chronologisch (Jahr → Monat → Tag).
+// Ein Block pro Monat, darin die Tage 1…N der Reihe nach.
 function renderHeatmap(history) {
   // Trainings pro Tag zählen (lokales Datum)
   let counts = {};
@@ -105,46 +106,46 @@ function renderHeatmap(history) {
     counts[key] = (counts[key] || 0) + 1;
   });
 
-  const WEEKS = 26;
+  const MONTHS = 6;
+  const MONTH_NAMES = ["Januar", "Februar", "März", "April", "Mai", "Juni",
+                       "Juli", "August", "September", "Oktober", "November", "Dezember"];
+
   let today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  let start = new Date(today);
-  start.setDate(today.getDate() - (WEEKS - 1) * 7); // Kalender-Arithmetik (DST-sicher)
-  start = startOfWeek(start);
-
   let html = "";
 
-  for (let w = 0; w < WEEKS; w++) {
-    html += `<div class="heat-col">`;
+  // Monate vom ältesten (vor 5 Monaten) bis zum aktuellen
+  for (let m = MONTHS - 1; m >= 0; m--) {
+    let ref = new Date(today.getFullYear(), today.getMonth() - m, 1);
+    let year = ref.getFullYear();
+    let month = ref.getMonth();
+    let daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    for (let d = 0; d < 7; d++) {
-      // Kalender-Arithmetik statt Millisekunden (sonst verschiebt die Sommerzeit die Tage)
-      let date = new Date(start);
-      date.setDate(start.getDate() + w * 7 + d);
+    let cells = "";
+    for (let day = 1; day <= daysInMonth; day++) {
+      let date = new Date(year, month, day);
 
       if (date > today) {
-        html += `<div class="heat-cell heat-future"></div>`;
+        cells += `<div class="heat-cell heat-future"></div>`;
         continue;
       }
 
-      let key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-      let n = counts[key] || 0;
+      let n = counts[`${year}-${month}-${day}`] || 0;
       let cls = n >= 2 ? "heat-2" : n === 1 ? "heat-1" : "";
       let label = date.toLocaleDateString("de-CH") + (n ? ` — ${n} Training${n > 1 ? "s" : ""}` : "");
 
-      html += `<div class="heat-cell ${cls}" title="${label}"></div>`;
+      cells += `<div class="heat-cell ${cls}" title="${label}"></div>`;
     }
 
-    html += `</div>`;
+    html += `
+      <div class="heat-month">
+        <div class="heat-month-label">${MONTH_NAMES[month]} ${year}</div>
+        <div class="heat-days">${cells}</div>
+      </div>`;
   }
 
-  let heatmap = document.getElementById("heatmap");
-  heatmap.innerHTML = html;
-
-  // ans Ende scrollen (heute ist rechts)
-  let wrap = document.getElementById("heatmapWrap");
-  wrap.scrollLeft = wrap.scrollWidth;
+  document.getElementById("heatmap").innerHTML = html;
 }
 
 function loadTrainingLog() {

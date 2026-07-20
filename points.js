@@ -8,8 +8,8 @@
 //   +15  persönlicher Rekord (geschätztes 1RM)
 
 const LEVEL_TITLES = [
-  "Rookie", "Eisenschieber", "Pumper", "Kraftprotz", "Bulldozer",
-  "Maschine", "Brutale Maschine", "Gym-Legende", "Absolute Einheit"
+  "Mega Kek", "Lauch", "Knecht", "NPC", "Traktor",
+  "Maschine", "Panzer", "brutal getrainiert", "Chad", "Genesis Gym Member"
 ];
 
 function computePoints(history) {
@@ -55,10 +55,34 @@ function computePoints(history) {
   return total;
 }
 
-// Level: alle 100 Punkte eins rauf
+// Level-Kurve: Abstände 100, 200, 300, danach Fibonacci (jeder = Summe der zwei vorherigen).
+// Gesamt-EP pro Level: L2=100, L3=300, L4=600, L5=1100, L6=1900, L7=3200, L8=5300, L9=8700, L10=14200 …
+// progress = Fortschritt im aktuellen Level in Prozent, remaining = fehlende Punkte bis zum nächsten Level.
 function getLevelInfo(total) {
-  let level = Math.floor(total / 100) + 1;
-  let title = LEVEL_TITLES[Math.min(level - 1, LEVEL_TITLES.length - 1)];
-  let progress = total % 100;
-  return { level, title, progress };
+  let gaps = [100, 200]; // Abstand Level 1→2, dann 2→3
+  let level = 1;
+  let base = 0; // Punkte-Schwelle des aktuellen Levels
+  let i = 0;    // Index des Abstands aktuelles → nächstes Level
+
+  while (true) {
+    // nächsten Abstand bei Bedarf per Fibonacci erzeugen
+    while (i >= gaps.length) gaps.push(gaps[gaps.length - 1] + gaps[gaps.length - 2]);
+
+    let gap = gaps[i];
+
+    if (total >= base + gap) {
+      base += gap;
+      level++;
+      i++;
+    } else {
+      let intoLevel = total - base;
+      let title = LEVEL_TITLES[Math.min(level - 1, LEVEL_TITLES.length - 1)];
+      return {
+        level,
+        title,
+        progress: Math.floor((intoLevel / gap) * 100),
+        remaining: gap - intoLevel
+      };
+    }
+  }
 }
