@@ -109,8 +109,13 @@ function drawChart(data, oneRMData) {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // 🎨 Farben aus dem aktuellen Theme lesen (strukturelle Farben passen sich an)
+  let cGrid = cssVar("--border", "#33333f");
+  let cLabel = cssVar("--muted", "#9a9aa8");
+  let cWeight = cssVar("--accent2", "#4da3ff");
+
   if (data.length === 0) {
-    ctx.fillStyle = "#9a9aa8";
+    ctx.fillStyle = cLabel;
     ctx.font = "14px Arial";
     ctx.fillText("Keine Daten vorhanden", 80, 100);
     return;
@@ -140,13 +145,13 @@ function drawChart(data, oneRMData) {
 
     // Grid
     ctx.beginPath();
-    ctx.strokeStyle = "#33333f";
+    ctx.strokeStyle = cGrid;
     ctx.moveTo(padding, y);
     ctx.lineTo(canvas.width - padding, y);
     ctx.stroke();
 
     // Label
-    ctx.fillStyle = "#9a9aa8";
+    ctx.fillStyle = cLabel;
     ctx.font = "12px Arial";
     ctx.fillText(value.toFixed(0) + "kg", 0, y + 4);
   }
@@ -163,7 +168,7 @@ function drawChart(data, oneRMData) {
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   });
-  ctx.strokeStyle = "#4da3ff";
+  ctx.strokeStyle = cWeight;
   ctx.lineWidth = 2;
   ctx.stroke();
 
@@ -184,7 +189,7 @@ function drawChart(data, oneRMData) {
   ctx.stroke();
 
   // 🔹 Punkte
-  ctx.fillStyle = "#4da3ff";
+  ctx.fillStyle = cWeight;
   data.forEach((value, i) => {
     let x = padding + i * stepX;
     let y =
@@ -196,14 +201,14 @@ function drawChart(data, oneRMData) {
   });
 
   // 🔹 Legende
-  ctx.fillStyle = "#4da3ff";
+  ctx.fillStyle = cWeight;
   ctx.fillText("Gewicht", canvas.width - 100, 20);
 
   ctx.fillStyle = "#ff6b6b";
   ctx.fillText("1RM", canvas.width - 100, 40);
 
   // 🔥 Achsen
-  ctx.strokeStyle = "#6a6a78";
+  ctx.strokeStyle = cLabel;
 
   ctx.beginPath();
   ctx.moveTo(padding, padding);
@@ -248,7 +253,7 @@ function highlightPoint() {
   // 🔥 Highlight
   ctx.beginPath();
   ctx.arc(x, y, 6, 0, Math.PI * 2);
-  ctx.fillStyle = "#ff6b35";
+  ctx.fillStyle = cssVar("--accent", "#ff6b35");
   ctx.fill();
 
   // 🔥 Info anzeigen

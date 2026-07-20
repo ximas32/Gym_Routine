@@ -84,12 +84,12 @@ function renderBodyweight() {
     let y = toY(value);
 
     ctx.beginPath();
-    ctx.strokeStyle = "#33333f";
+    ctx.strokeStyle = cssVar("--border", "#33333f");
     ctx.moveTo(padding, y);
     ctx.lineTo(canvas.width - padding, y);
     ctx.stroke();
 
-    ctx.fillStyle = "#9a9aa8";
+    ctx.fillStyle = cssVar("--muted", "#9a9aa8");
     ctx.font = "11px Arial";
     ctx.fillText(value.toFixed(1), 0, y + 4);
   }
