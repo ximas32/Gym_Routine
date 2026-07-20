@@ -6,7 +6,7 @@ document.getElementById("statsPage").innerHTML = `
 
   <div id="statTiles"></div>
 
-  <h4>Aktivität (6 Monate)</h4>
+  <h4>Aktivität (2 Monate)</h4>
   <div id="heatmapWrap"><div id="heatmap"></div></div>
 
   <h4>Trainings-Log</h4>
@@ -31,6 +31,12 @@ function loadStats() {
   let thisWeek = history.filter(h => {
     let d = new Date(h.date);
     return !isNaN(d) && d >= weekStart;
+  });
+
+  // 🔹 Trainings dieses Jahr (wie oft warst du im Gym?)
+  let thisYear = history.filter(h => {
+    let d = new Date(h.date);
+    return !isNaN(d) && d.getFullYear() === now.getFullYear();
   });
 
   // 🔹 Volumen diese Woche (Summe reps × Gewicht)
@@ -74,8 +80,8 @@ function loadStats() {
 
   document.getElementById("statTiles").innerHTML = `
     <div class="stat-tile">
-      <div class="stat-value">${thisWeek.length}</div>
-      <div class="stat-label">Trainings diese Woche</div>
+      <div class="stat-value">${thisYear.length}</div>
+      <div class="stat-label">Trainings dieses Jahr</div>
     </div>
     <div class="stat-tile">
       <div class="stat-value">${streak} 🔥</div>
@@ -106,7 +112,7 @@ function renderHeatmap(history) {
     counts[key] = (counts[key] || 0) + 1;
   });
 
-  const MONTHS = 6;
+  const MONTHS = 2;
   const MONTH_NAMES = ["Januar", "Februar", "März", "April", "Mai", "Juni",
                        "Juli", "August", "September", "Oktober", "November", "Dezember"];
 
