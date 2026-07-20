@@ -161,7 +161,10 @@ function loadTrainingLog() {
 
     let details = Object.entries(session.data).map(([name, ex]) => {
       let reps = (ex.reps || []).length ? ex.reps.join(" / ") : "–";
-      return `<div class="log-exercise">${escapeHtml(name)}: ${reps} @ ${ex.weight}kg</div>`;
+      let comment = ex.comment
+        ? `<div class="log-comment">💬 ${escapeHtml(ex.comment)}</div>`
+        : "";
+      return `<div class="log-exercise">${escapeHtml(name)}: ${reps} @ ${ex.weight}kg${comment}</div>`;
     }).join("");
 
     let dateLabel = new Date(session.date);

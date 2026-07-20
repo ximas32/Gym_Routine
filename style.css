@@ -345,9 +345,37 @@ li button {
   padding: 3px 0;
 }
 
+.log-comment {
+  color: var(--accent2);
+  font-size: 13px;
+  padding: 2px 0 4px 14px;
+}
+
 .last-values {
   color: var(--accent2);
   font-size: 14px;
+}
+
+.last-comment {
+  color: var(--muted);
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* ℹ️ Info-Button in Übungslisten */
+.workout-item-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.info-btn {
+  margin: 0;
+  padding: 8px 10px;
+  font-size: 15px;
+  background: none;
+  border: none;
 }
 
 /* 📤 Teilen */

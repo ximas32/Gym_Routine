@@ -164,8 +164,18 @@ function showExerciseInfo(name) {
 
   let ytQuery = encodeURIComponent(ex.name + " gym exercise");
 
+  // Im Auswähl-Modus (pickerTargetId gesetzt) zurück zur Liste + "wählen"-Button;
+  // im reinen Ansehen-Modus (aus dem Workout) stattdessen nur schliessen.
+  let backBtn = pickerTargetId
+    ? `<button class="picker-back" onclick="renderPickerList()">← Zurück zur Liste</button>`
+    : `<button class="picker-back" onclick="closeExercisePicker()">← Schliessen</button>`;
+
+  let chooseBtn = pickerTargetId
+    ? `<button onclick="pickExercise(this.dataset.name, false)" data-name="${escapeHtml(ex.name)}">Diese Übung wählen</button>`
+    : "";
+
   info.innerHTML = `
-    <button class="picker-back" onclick="renderPickerList()">← Zurück zur Liste</button>
+    ${backBtn}
 
     <h3>${escapeHtml(ex.name)}</h3>
 
@@ -180,10 +190,39 @@ function showExerciseInfo(name) {
 
     <a class="picker-video" href="https://www.youtube.com/results?search_query=${ytQuery}" target="_blank" rel="noopener">🎬 Video zur Ausführung (YouTube)</a>
 
-    <button onclick="pickExercise(this.dataset.name, false)" data-name="${escapeHtml(ex.name)}">Diese Übung wählen</button>
+    ${chooseBtn}
   `;
 
   list.classList.add("hidden");
   info.classList.remove("hidden");
   info.scrollTop = 0;
+}
+
+// 🔹 Übung nur ansehen (aus dem Workout heraus, ohne Auswählen)
+// Bibliotheks-Übung → Info-Sheet mit Fotos/Anleitung; eigene Übung → YouTube-Suche.
+async function viewExerciseInfo(name) {
+  // Bibliothek bei Bedarf laden (wird danach zwischengespeichert)
+  if (!libraryData) {
+    try {
+      let r = await fetch("exercises.json");
+      libraryData = await r.json();
+    } catch {
+      libraryData = [];
+    }
+  }
+
+  let ex = libraryData.find(e => e.name === name);
+
+  // Keine Bibliotheks-Übung (z.B. eigene) → direkt YouTube-Suche öffnen
+  if (!ex) {
+    let ytQuery = encodeURIComponent(name + " gym exercise");
+    window.open("https://www.youtube.com/results?search_query=" + ytQuery, "_blank", "noopener");
+    return;
+  }
+
+  // Overlay im Nur-Ansehen-Modus öffnen (kein Ziel-Feld → kein "wählen"-Button)
+  pickerTargetId = null;
+  document.getElementById("pickerOverlay").classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  showExerciseInfo(name);
 }

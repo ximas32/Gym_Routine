@@ -19,7 +19,8 @@ document.getElementById("workoutPage").innerHTML = `
 `;
 
 // 🔥 aktuelle Session (Key = Übungs-Index, damit gleiche Namen nicht kollidieren)
-let currentSession = {};
+let currentSession = {};          // Index → Reps-Array
+let currentSessionComments = {};  // Index → Kommentartext
 let currentSessionWorkout = "";
 
 
@@ -67,6 +68,7 @@ function loadWorkout() {
   // 👇 anderes Workout gewählt → Session zurücksetzen
   if (selected !== currentSessionWorkout) {
     currentSession = {};
+    currentSessionComments = {};
     currentSessionWorkout = selected;
   }
 
@@ -90,8 +92,11 @@ function loadWorkout() {
     let done = currentSession[index] ? "✅" : "";
 
     li.innerHTML = `
-      ${done} ${escapeHtml(ex.name)} (${ex.sets}x${ex.reps} - ${ex.weight}kg)
-      <button onclick="startExercise(${index})">Start</button>
+      <span>${done} ${escapeHtml(ex.name)} (${ex.sets}x${ex.reps} - ${ex.weight}kg)</span>
+      <span class="workout-item-actions">
+        <button class="info-btn" data-name="${escapeHtml(ex.name)}" onclick="viewExerciseInfo(this.dataset.name)" title="Ausführung ansehen">ℹ️</button>
+        <button onclick="startExercise(${index})">Start</button>
+      </span>
     `;
 
     display.appendChild(li);
@@ -122,13 +127,18 @@ function startExercise(index) {
   for (let i = history.length - 1; i >= 0; i--) {
     let data = history[i].data && history[i].data[exercise.name];
     if (data && data.reps && data.reps.length > 0) {
-      last = { reps: data.reps, weight: data.weight, date: history[i].date };
+      last = { reps: data.reps, weight: data.weight, date: history[i].date, comment: data.comment };
       break;
     }
   }
 
   let lastLine = last
     ? `<p class="last-values">Letztes Mal (${formatDate(last.date)}): <b>${last.reps.join(" / ")}</b> @ ${last.weight}kg</p>`
+    : "";
+
+  // 💬 Kommentar vom letzten Mal als Erinnerung anzeigen
+  let lastComment = last && last.comment
+    ? `<p class="last-comment">💬 letztes Mal: ${escapeHtml(last.comment)}</p>`
     : "";
 
   let inputs = "";
@@ -141,11 +151,18 @@ function startExercise(index) {
   }
 
   display.innerHTML = `
-    <h3>${escapeHtml(exercise.name)} ${exercise.weight}kg</h3>
+    <h3>
+      ${escapeHtml(exercise.name)} ${exercise.weight}kg
+      <button class="info-btn" data-name="${escapeHtml(exercise.name)}" onclick="viewExerciseInfo(this.dataset.name)" title="Ausführung ansehen">ℹ️</button>
+    </h3>
     <p>Ziel: ${exercise.sets}x${exercise.reps}</p>
     ${lastLine}
+    ${lastComment}
 
     ${inputs}
+
+    <label>Kommentar (optional)</label>
+    <input id="exComment" placeholder="z.B. Schulter zwickt, neue Bank…" value="${escapeHtml(currentSessionComments[index] || "")}">
 
     <button onclick="saveExercise(${index})">Speichern</button>
     <button onclick="backToWorkout()">Zurück</button>
@@ -199,6 +216,11 @@ function saveExercise(index) {
 
   currentSession[index] = results;
 
+  // 💬 Kommentar merken (leer = kein Eintrag)
+  let comment = document.getElementById("exComment").value.trim();
+  if (comment) currentSessionComments[index] = comment;
+  else delete currentSessionComments[index];
+
   backToWorkout();
 }
 
@@ -226,7 +248,8 @@ function finishWorkout() {
       reps: currentSession[index] || [],
       weight: ex.weight,
       target: ex.reps, // 🏆 Ziel mitspeichern für die Punkteberechnung
-      sets: ex.sets
+      sets: ex.sets,
+      comment: currentSessionComments[index] || "" // 💬 optionaler Kommentar
     };
   });
 
@@ -246,6 +269,7 @@ function finishWorkout() {
   alert(`Maschine brutal getraininert 💪\n+${pointsGained} Punkte! 🏆`);
 
   currentSession = {};
+  currentSessionComments = {};
   currentSessionWorkout = "";
 
   document.getElementById("workoutSelect").value = "";
