@@ -39,7 +39,7 @@ function loadWorkoutList() {
   // 👇 Default Option
   let defaultOption = document.createElement("option");
   defaultOption.value = "";
-  defaultOption.text = "Bitte wählen";
+  defaultOption.text = t("Bitte wählen", "Please choose");
   defaultOption.selected = true;
 
   select.appendChild(defaultOption);
