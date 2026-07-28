@@ -69,34 +69,49 @@ applyTheme(getTheme());
 
 // --- Einstellungs-UI ---
 document.body.insertAdjacentHTML("beforeend", `
-  <button id="settingsBtn" onclick="openSettings()" title="Farben anpassen">⚙️</button>
+  <button id="settingsBtn" onclick="openSettings()" title="${t("Einstellungen", "Settings")}">⚙️</button>
 
   <div id="settingsOverlay" class="hidden" onclick="if(event.target===this)closeSettings()">
     <div id="settingsSheet">
-      <h3>🎨 Farben anpassen</h3>
+      <h3>⚙️ ${t("Einstellungen", "Settings")}</h3>
 
-      <label class="color-row">Hintergrund <input type="color" id="col-bg" oninput="onColorChange()"></label>
-      <label class="color-row">Schrift <input type="color" id="col-text" oninput="onColorChange()"></label>
-      <label class="color-row">Akzent <input type="color" id="col-accent" oninput="onColorChange()"></label>
+      <label class="color-row">${t("Sprache", "Language")}
+        <select id="langSelect" onchange="setLang(this.value)">
+          <option value="de">Deutsch</option>
+          <option value="en">English</option>
+        </select>
+      </label>
+
+      <label class="color-row">${t("Hintergrund", "Background")} <input type="color" id="col-bg" oninput="onColorChange()"></label>
+      <label class="color-row">${t("Schrift", "Text")} <input type="color" id="col-text" oninput="onColorChange()"></label>
+      <label class="color-row">${t("Akzent", "Accent")} <input type="color" id="col-accent" oninput="onColorChange()"></label>
 
       <div id="presetRow"></div>
 
       <div class="settings-actions">
-        <button onclick="resetTheme()">Farben zurücksetzen</button>
-        <button onclick="closeSettings()">Fertig</button>
+        <button onclick="resetTheme()">${t("Farben zurücksetzen", "Reset colors")}</button>
+        <button onclick="closeSettings()">${t("Fertig", "Done")}</button>
       </div>
 
       <div class="settings-danger">
-        <button class="danger-btn" onclick="resetProgress()">💉 Neustart mit Anabolika</button>
-        <p class="danger-hint">Löscht alle Trainings, Punkte/Level und Körpergewicht. Deine Workouts bleiben.</p>
+        <button class="danger-btn" onclick="resetProgress()">💉 ${t("Neustart mit Anabolika", "Fresh Start on Roids")}</button>
+        <p class="danger-hint">${t("Löscht alle Trainings, Punkte/Level und Körpergewicht. Deine Workouts bleiben.", "Deletes all trainings, points/levels and bodyweight. Your workouts stay.")}</p>
       </div>
     </div>
   </div>
 `);
 
-// Preset-Buttons erzeugen
+// Preset-Buttons erzeugen (interner Schlüssel bleibt, nur die Anzeige wird übersetzt)
+const PRESET_LABELS = {
+  "Dunkel": t("Dunkel", "Dark"),
+  "Mitternacht": t("Mitternacht", "Midnight"),
+  "Wald": t("Wald", "Forest"),
+  "Pink": "Pink",
+  "Hell": t("Hell", "Light")
+};
+
 document.getElementById("presetRow").innerHTML = Object.keys(THEME_PRESETS)
-  .map(name => `<button class="preset-btn" onclick="applyPreset('${name}')">${name}</button>`)
+  .map(name => `<button class="preset-btn" onclick="applyPreset('${name}')">${PRESET_LABELS[name] || name}</button>`)
   .join("");
 
 function openSettings() {
@@ -104,6 +119,7 @@ function openSettings() {
   document.getElementById("col-bg").value = theme.bg;
   document.getElementById("col-text").value = theme.text;
   document.getElementById("col-accent").value = theme.accent;
+  document.getElementById("langSelect").value = LANG;
   document.getElementById("settingsOverlay").classList.remove("hidden");
 }
 
@@ -140,21 +156,28 @@ function resetTheme() {
 // 💉 Statistik + Progress zurücksetzen (Trainings-History & Körpergewicht löschen).
 // Workouts, eigene Übungen und Farben bleiben erhalten.
 function resetProgress() {
-  let ok = confirm(
+  let ok = confirm(t(
     "💉 Neustart mit Anabolika?\n\n" +
     "Alle aufgezeichneten Trainings, Punkte/Level und Körpergewichts-Einträge werden gelöscht.\n" +
     "Deine Workouts bleiben erhalten.\n\n" +
-    "Tipp: Vorher ein Backup exportieren!"
-  );
+    "Tipp: Vorher ein Backup exportieren!",
+    "💉 Fresh Start on Roids?\n\n" +
+    "All recorded trainings, points/levels and bodyweight entries will be deleted.\n" +
+    "Your workouts stay.\n\n" +
+    "Tip: Export a backup first!"
+  ));
   if (!ok) return;
 
-  let sure = confirm("Wirklich alles zurücksetzen? Das kann nicht rückgängig gemacht werden.");
+  let sure = confirm(t(
+    "Wirklich alles zurücksetzen? Das kann nicht rückgängig gemacht werden.",
+    "Really reset everything? This cannot be undone."
+  ));
   if (!sure) return;
 
   localStorage.removeItem("history");
   localStorage.removeItem("bodyweight");
 
-  alert("Frisch geduscht, Nadel weg, neu gestartet! 💪");
+  alert(t("Frisch geduscht, Nadel weg, neu gestartet! 💪", "Freshly showered, needle gone, restarted! 💪"));
   location.reload();
 }
 

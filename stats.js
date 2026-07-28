@@ -1,15 +1,15 @@
 // 📊 Statistik-Tab: Kacheln + Trainings-Log
 document.getElementById("statsPage").innerHTML = `
-  <h3>Statistik</h3>
+  <h3>${t("Statistik", "Stats")}</h3>
 
   <div id="levelCard"></div>
 
   <div id="statTiles"></div>
 
-  <h4>Aktivität (2 Monate)</h4>
+  <h4>${t("Aktivität (2 Monate)", "Activity (2 months)")}</h4>
   <div id="heatmapWrap"><div id="heatmap"></div></div>
 
-  <h4>Trainings-Log</h4>
+  <h4>${t("Trainings-Log", "Training log")}</h4>
   <div id="trainingLog"></div>
 `;
 
@@ -71,9 +71,9 @@ function loadStats() {
 
   document.getElementById("levelCard").innerHTML = `
     <div class="level-title">Level ${level} — ${escapeHtml(title)}</div>
-    <div class="level-points">${total.toLocaleString("de-CH")} Punkte 🏆</div>
+    <div class="level-points">${total.toLocaleString(locale())} ${t("Punkte", "points")} 🏆</div>
     <div class="level-bar"><div class="level-fill" style="width:${progress}%"></div></div>
-    <div class="level-next">${remaining.toLocaleString("de-CH")} Punkte bis Level ${level + 1}</div>
+    <div class="level-next">${remaining.toLocaleString(locale())} ${t("Punkte bis Level", "points to level")} ${level + 1}</div>
   `;
 
   renderHeatmap(history);
@@ -81,19 +81,19 @@ function loadStats() {
   document.getElementById("statTiles").innerHTML = `
     <div class="stat-tile">
       <div class="stat-value">${thisYear.length}</div>
-      <div class="stat-label">Trainings dieses Jahr</div>
+      <div class="stat-label">${t("Trainings dieses Jahr", "Trainings this year")}</div>
     </div>
     <div class="stat-tile">
       <div class="stat-value">${streak} 🔥</div>
-      <div class="stat-label">Wochen-Streak</div>
+      <div class="stat-label">${t("Wochen-Streak", "Week streak")}</div>
     </div>
     <div class="stat-tile">
       <div class="stat-value">${history.length}</div>
-      <div class="stat-label">Trainings gesamt</div>
+      <div class="stat-label">${t("Trainings gesamt", "Trainings total")}</div>
     </div>
     <div class="stat-tile">
-      <div class="stat-value">${Math.round(volume).toLocaleString("de-CH")}</div>
-      <div class="stat-label">kg Volumen (Woche)</div>
+      <div class="stat-value">${Math.round(volume).toLocaleString(locale())}</div>
+      <div class="stat-label">${t("kg Volumen (Woche)", "kg volume (week)")}</div>
     </div>
   `;
 
@@ -113,8 +113,6 @@ function renderHeatmap(history) {
   });
 
   const MONTHS = 2;
-  const MONTH_NAMES = ["Januar", "Februar", "März", "April", "Mai", "Juni",
-                       "Juli", "August", "September", "Oktober", "November", "Dezember"];
 
   let today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -139,14 +137,17 @@ function renderHeatmap(history) {
 
       let n = counts[`${year}-${month}-${day}`] || 0;
       let cls = n >= 2 ? "heat-2" : n === 1 ? "heat-1" : "";
-      let label = date.toLocaleDateString("de-CH") + (n ? ` — ${n} Training${n > 1 ? "s" : ""}` : "");
+      let trainingWord = n === 1 ? t("Training", "training") : t("Trainings", "trainings");
+      let label = date.toLocaleDateString(locale()) + (n ? ` — ${n} ${trainingWord}` : "");
 
       cells += `<div class="heat-cell ${cls}" title="${label}"></div>`;
     }
 
+    let monthLabel = new Date(year, month, 1).toLocaleDateString(locale(), { month: "long", year: "numeric" });
+
     html += `
       <div class="heat-month">
-        <div class="heat-month-label">${MONTH_NAMES[month]} ${year}</div>
+        <div class="heat-month-label">${monthLabel}</div>
         <div class="heat-days">${cells}</div>
       </div>`;
   }
@@ -159,7 +160,7 @@ function loadTrainingLog() {
   let log = document.getElementById("trainingLog");
 
   if (history.length === 0) {
-    log.innerHTML = `<p class="picker-hint">Noch keine Trainings aufgezeichnet</p>`;
+    log.innerHTML = `<p class="picker-hint">${t("Noch keine Trainings aufgezeichnet", "No trainings recorded yet")}</p>`;
     return;
   }
 
@@ -177,13 +178,13 @@ function loadTrainingLog() {
     let dateLabel = new Date(session.date);
     let dateText = isNaN(dateLabel)
       ? session.date
-      : dateLabel.toLocaleDateString("de-CH", { weekday: "short", day: "numeric", month: "numeric", year: "2-digit" });
+      : dateLabel.toLocaleDateString(locale(), { weekday: "short", day: "numeric", month: "numeric", year: "2-digit" });
 
     return `
       <div class="log-entry" onclick="this.classList.toggle('open')">
         <div class="log-head">
           <span>${escapeHtml(dateText)}${session.workout ? " — " + escapeHtml(session.workout) : ""}</span>
-          <span class="log-count">${done.length} Übungen ▾</span>
+          <span class="log-count">${done.length} ${t("Übungen", "exercises")} ▾</span>
         </div>
         <div class="log-details">${details}</div>
       </div>`;

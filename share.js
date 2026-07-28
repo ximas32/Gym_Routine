@@ -40,7 +40,7 @@ async function shareWorkout() {
   let selected = document.getElementById("workoutSelect").value;
 
   if (!selected) {
-    alert("Bitte zuerst ein Workout auswählen!");
+    alert(t("Bitte zuerst ein Workout auswählen!", "Please choose a workout first!"));
     return;
   }
 
@@ -60,9 +60,9 @@ async function shareWorkout() {
   // 💻 Fallback: Link in Zwischenablage
   try {
     await navigator.clipboard.writeText(url);
-    showToast("Link kopiert! 📤");
+    showToast(t("Link kopiert! 📤", "Link copied! 📤"));
   } catch {
-    prompt("Link kopieren:", url);
+    prompt(t("Link kopieren:", "Copy link:"), url);
   }
 }
 
@@ -77,13 +77,16 @@ function importWorkoutFromCode(code) {
   try {
     shared = decodeWorkout(code);
   } catch {
-    alert("Der Link/Code ist ungültig!");
+    alert(t("Der Link/Code ist ungültig!", "The link/code is invalid!"));
     return;
   }
 
   let exerciseList = shared.exercises.map(ex => `• ${ex.name} (${ex.sets}x${ex.reps})`).join("\n");
 
-  let ok = confirm(`Geteiltes Workout importieren?\n\n"${shared.name}"\n${exerciseList}`);
+  let ok = confirm(t(
+    `Geteiltes Workout importieren?\n\n"${shared.name}"\n${exerciseList}`,
+    `Import shared workout?\n\n"${shared.name}"\n${exerciseList}`
+  ));
   if (!ok) return;
 
   let workouts = getWorkouts();
@@ -101,14 +104,14 @@ function importWorkoutFromCode(code) {
   document.getElementById("workoutSelect").value = name;
   loadWorkout();
 
-  showToast("Workout importiert! 💪");
+  showToast(t("Workout importiert! 💪", "Workout imported! 💪"));
 }
 
 // 🔹 📥 In der App: Link einfügen und importieren
 // (wichtig für iOS: Die installierte App und Safari haben getrennte Speicher —
 //  ein im Browser geöffneter Link landet sonst nicht in der App)
 function importSharedWorkout() {
-  let text = prompt("Geteilten Link (oder Code) hier einfügen:");
+  let text = prompt(t("Geteilten Link (oder Code) hier einfügen:", "Paste the shared link (or code) here:"));
   if (!text) return;
   importWorkoutFromCode(text);
 }

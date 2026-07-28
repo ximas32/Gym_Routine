@@ -32,8 +32,8 @@
 
   <!-- 💾 Backup -->
   <div id="dataBar">
-    <button onclick="exportData()">⬇️ Backup exportieren</button>
-    <button onclick="document.getElementById('importFile').click()">⬆️ Backup importieren</button>
+    <button id="btnExport" onclick="exportData()">⬇️ Backup exportieren</button>
+    <button id="btnImport" onclick="document.getElementById('importFile').click()">⬆️ Backup importieren</button>
     <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
   </div>
 </main>
@@ -46,6 +46,7 @@
   <button id="nav-stats" class="nav-btn" onclick="showPage('stats')">📊<span>Statistik</span></button>
 </nav>
 
+<script src="i18n.js"></script>
 <script src="storage.js"></script>
 <script src="theme.js"></script>
 <script src="library.js"></script>

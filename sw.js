@@ -5,12 +5,13 @@
 //
 // 🔧 Bei jeder Änderung an der App die Versionsnummer erhöhen,
 // damit installierte PWAs das Update bekommen!
-const CACHE = "gym-routine-v13";
+const CACHE = "gym-routine-v14";
 
 const ASSETS = [
   "./",
   "./index.html",
   "./style.css",
+  "./i18n.js",
   "./storage.js",
   "./theme.js",
   "./library.js",

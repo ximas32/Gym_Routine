@@ -12,6 +12,27 @@ const EQUIPMENT_DE = {
 
 const LEVEL_DE = { "beginner": "Anfänger", "intermediate": "Fortgeschritten", "expert": "Profi" };
 
+// Muskelgruppen (in exercises.json deutsch gespeichert) für die englische Anzeige
+const GROUP_EN = {
+  "Eigene Übungen": "My exercises", "Brust": "Chest", "Rücken": "Back",
+  "Schultern": "Shoulders", "Bizeps": "Biceps", "Trizeps": "Triceps",
+  "Unterarme": "Forearms", "Bauch": "Abs", "Beine": "Legs", "Sonstiges": "Other"
+};
+
+function groupLabel(g) {
+  return LANG === "en" ? (GROUP_EN[g] || g) : g;
+}
+
+function equipmentLabel(eq) {
+  if (!eq) return "–";
+  return LANG === "en" ? eq.charAt(0).toUpperCase() + eq.slice(1) : (EQUIPMENT_DE[eq] || eq);
+}
+
+function levelLabel(lv) {
+  if (!lv) return "–";
+  return LANG === "en" ? lv.charAt(0).toUpperCase() + lv.slice(1) : (LEVEL_DE[lv] || lv);
+}
+
 let libraryData = null;   // Bibliothek (lazy geladen)
 let pickerTargetId = null; // welches Input-Feld befüllt wird
 
@@ -34,7 +55,7 @@ document.body.insertAdjacentHTML("beforeend", `
   <div id="pickerOverlay" class="hidden" onclick="if(event.target===this)closeExercisePicker()">
     <div id="pickerSheet">
       <div id="pickerHeader">
-        <input id="pickerSearch" placeholder="🔍 Übung suchen…" oninput="renderPickerList()">
+        <input id="pickerSearch" placeholder="${t("🔍 Übung suchen…", "🔍 Search exercise…")}" oninput="renderPickerList()">
         <button id="pickerClose" onclick="closeExercisePicker()">✕</button>
       </div>
       <div id="pickerList"></div>
@@ -56,7 +77,7 @@ function openExercisePicker(targetId) {
   if (libraryData) {
     renderPickerList();
   } else {
-    document.getElementById("pickerList").innerHTML = `<p class="picker-hint">Bibliothek wird geladen…</p>`;
+    document.getElementById("pickerList").innerHTML = `<p class="picker-hint">${t("Bibliothek wird geladen…", "Loading library…")}</p>`;
     fetch("exercises.json")
       .then(r => r.json())
       .then(data => { libraryData = data; renderPickerList(); })
@@ -95,7 +116,7 @@ function renderPickerList() {
   if (queryRaw && !entries.some(ex => ex.name.toLowerCase() === query)) {
     html += `
       <div class="picker-item picker-custom" onclick="pickExercise(this.dataset.name, true)" data-name="${escapeHtml(queryRaw)}">
-        ➕ „${escapeHtml(queryRaw)}“ als eigene Übung verwenden
+        ➕ ${t(`„${escapeHtml(queryRaw)}“ als eigene Übung verwenden`, `Use “${escapeHtml(queryRaw)}” as your own exercise`)}
       </div>`;
   }
 
@@ -108,7 +129,7 @@ function renderPickerList() {
 
     if (ex.group !== currentGroup) {
       currentGroup = ex.group;
-      html += `<div class="picker-group">${escapeHtml(currentGroup)}</div>`;
+      html += `<div class="picker-group">${escapeHtml(groupLabel(currentGroup))}</div>`;
     }
 
     let infoBtn = ex.custom
@@ -124,7 +145,7 @@ function renderPickerList() {
     shown++;
   });
 
-  if (!html) html = `<p class="picker-hint">Keine Übung gefunden</p>`;
+  if (!html) html = `<p class="picker-hint">${t("Keine Übung gefunden", "No exercise found")}</p>`;
 
   list.innerHTML = html;
   list.scrollTop = 0;
@@ -141,7 +162,7 @@ function pickExercise(name, isCustom) {
 }
 
 function deleteCustomExercise(name) {
-  if (!confirm(`Eigene Übung „${name}“ aus der Liste entfernen?`)) return;
+  if (!confirm(t(`Eigene Übung „${name}“ aus der Liste entfernen?`, `Remove your own exercise “${name}” from the list?`))) return;
   let custom = getCustomExercises().filter(n => n !== name);
   localStorage.setItem("customExercises", JSON.stringify(custom));
   renderPickerList();
@@ -167,11 +188,11 @@ function showExerciseInfo(name) {
   // Im Auswähl-Modus (pickerTargetId gesetzt) zurück zur Liste + "wählen"-Button;
   // im reinen Ansehen-Modus (aus dem Workout) stattdessen nur schliessen.
   let backBtn = pickerTargetId
-    ? `<button class="picker-back" onclick="renderPickerList()">← Zurück zur Liste</button>`
-    : `<button class="picker-back" onclick="closeExercisePicker()">← Schliessen</button>`;
+    ? `<button class="picker-back" onclick="renderPickerList()">← ${t("Zurück zur Liste", "Back to list")}</button>`
+    : `<button class="picker-back" onclick="closeExercisePicker()">← ${t("Schliessen", "Close")}</button>`;
 
   let chooseBtn = pickerTargetId
-    ? `<button onclick="pickExercise(this.dataset.name, false)" data-name="${escapeHtml(ex.name)}">Diese Übung wählen</button>`
+    ? `<button onclick="pickExercise(this.dataset.name, false)" data-name="${escapeHtml(ex.name)}">${t("Diese Übung wählen", "Choose this exercise")}</button>`
     : "";
 
   info.innerHTML = `
@@ -180,15 +201,15 @@ function showExerciseInfo(name) {
     <h3>${escapeHtml(ex.name)}</h3>
 
     <p class="picker-meta">
-      ${escapeHtml(ex.group)} · ${escapeHtml(EQUIPMENT_DE[ex.equipment] || ex.equipment || "–")} · ${escapeHtml(LEVEL_DE[ex.level] || ex.level || "–")}<br>
-      Muskeln: ${escapeHtml(muscles || "–")}${ex.secondary.length ? " (+ " + escapeHtml(ex.secondary.join(", ")) + ")" : ""}
+      ${escapeHtml(groupLabel(ex.group))} · ${escapeHtml(equipmentLabel(ex.equipment))} · ${escapeHtml(levelLabel(ex.level))}<br>
+      ${t("Muskeln", "Muscles")}: ${escapeHtml(muscles || "–")}${ex.secondary.length ? " (+ " + escapeHtml(ex.secondary.join(", ")) + ")" : ""}
     </p>
 
     <div class="picker-images">${images}</div>
 
     ${steps ? `<ol class="picker-steps">${steps}</ol>` : ""}
 
-    <a class="picker-video" href="https://www.youtube.com/results?search_query=${ytQuery}" target="_blank" rel="noopener">🎬 Video zur Ausführung (YouTube)</a>
+    <a class="picker-video" href="https://www.youtube.com/results?search_query=${ytQuery}" target="_blank" rel="noopener">🎬 ${t("Video zur Ausführung (YouTube)", "How-to video (YouTube)")}</a>
 
     ${chooseBtn}
   `;

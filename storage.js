@@ -32,15 +32,15 @@ function escapeHtml(text) {
 function formatDate(isoString) {
   let date = new Date(isoString);
   if (isNaN(date)) return isoString;
-  return date.toLocaleDateString();
+  return date.toLocaleDateString(locale());
 }
 
 // ✅ Eingaben für eine Übung prüfen → Fehlertext oder null
 function validateExercise(name, sets, reps, weight) {
-  if (!name) return "Bitte Übungsname eingeben!";
-  if (!Number.isInteger(sets) || sets < 1) return "Sätze müssen eine ganze Zahl ab 1 sein!";
-  if (!Number.isInteger(reps) || reps < 1) return "Reps müssen eine ganze Zahl ab 1 sein!";
-  if (isNaN(weight) || weight < 0) return "Bitte gültiges Gewicht eingeben (0 oder mehr)!";
+  if (!name) return t("Bitte Übungsname eingeben!", "Please enter an exercise name!");
+  if (!Number.isInteger(sets) || sets < 1) return t("Sätze müssen eine ganze Zahl ab 1 sein!", "Sets must be a whole number of at least 1!");
+  if (!Number.isInteger(reps) || reps < 1) return t("Reps müssen eine ganze Zahl ab 1 sein!", "Reps must be a whole number of at least 1!");
+  if (isNaN(weight) || weight < 0) return t("Bitte gültiges Gewicht eingeben (0 oder mehr)!", "Please enter a valid weight (0 or more)!");
   return null;
 }
 
@@ -97,8 +97,14 @@ function checkBackupReminder() {
   localStorage.setItem("lastBackupReminder", now);
 
   let msg = lastBackup
-    ? `Dein letztes Backup ist ${Math.round((now - lastBackup) / DAY)} Tage her.\nJetzt Backup exportieren?`
-    : "Du hast noch nie ein Backup exportiert.\nJetzt eins erstellen?";
+    ? t(
+        `Dein letztes Backup ist ${Math.round((now - lastBackup) / DAY)} Tage her.\nJetzt Backup exportieren?`,
+        `Your last backup was ${Math.round((now - lastBackup) / DAY)} days ago.\nExport a backup now?`
+      )
+    : t(
+        "Du hast noch nie ein Backup exportiert.\nJetzt eins erstellen?",
+        "You have never exported a backup.\nCreate one now?"
+      );
 
   if (confirm(msg)) exportData();
 }
@@ -118,26 +124,28 @@ function importData(event) {
     try {
       data = JSON.parse(reader.result);
     } catch {
-      alert("Datei konnte nicht gelesen werden!");
+      alert(t("Datei konnte nicht gelesen werden!", "Could not read the file!"));
       return;
     }
 
     if (!data.workouts || !Array.isArray(data.history)) {
-      alert("Das ist kein gültiges Backup!");
+      alert(t("Das ist kein gültiges Backup!", "That is not a valid backup!"));
       return;
     }
 
-    let ok = confirm(
+    let ok = confirm(t(
       `Backup enthält ${Object.keys(data.workouts).length} Workouts und ${data.history.length} Trainings.\n` +
-      `Aktuelle Daten werden ersetzt. Fortfahren?`
-    );
+      `Aktuelle Daten werden ersetzt. Fortfahren?`,
+      `Backup contains ${Object.keys(data.workouts).length} workouts and ${data.history.length} trainings.\n` +
+      `Your current data will be replaced. Continue?`
+    ));
     if (!ok) return;
 
     saveWorkouts(data.workouts);
     saveHistory(data.history);
     migrateHistory();
 
-    alert("Backup importiert!");
+    alert(t("Backup importiert!", "Backup imported!"));
     location.reload();
   };
 

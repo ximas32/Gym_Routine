@@ -8,29 +8,29 @@ function addExerciseToWorkout() {
   let selected = document.getElementById("editSelect").value;
 
   if (!selected) {
-    alert("Bitte zuerst ein Workout auswählen!");
+    alert(t("Bitte zuerst ein Workout auswählen!", "Please choose a workout first!"));
     return;
   }
 
   let list = document.getElementById("editList");
 
   list.innerHTML = `
-  <h4>Neue Übung</h4>
+  <h4>${t("Neue Übung", "New exercise")}</h4>
 
-  <label>Übung</label><br>
-  <input id="new_name" readonly placeholder="Tippen zum Auswählen 📚" onclick="openExercisePicker('new_name')"><br>
+  <label>${t("Übung", "Exercise")}</label><br>
+  <input id="new_name" readonly placeholder="${t("Tippen zum Auswählen 📚", "Tap to choose 📚")}" onclick="openExercisePicker('new_name')"><br>
 
-  <label>Sätze</label><br>
+  <label>${t("Sätze", "Sets")}</label><br>
   <input id="new_sets" type="number" min="1"><br>
 
   <label>Reps</label><br>
   <input id="new_reps" type="number" min="1"><br>
 
-  <label>Gewicht</label><br>
+  <label>${t("Gewicht", "Weight")}</label><br>
   <input id="new_weight" type="number" min="0" step="0.5"><br><br>
 
-  <button onclick="saveNewExercise()">Speichern</button>
-  <button onclick="loadEditWorkout()">Zurück</button>
+  <button onclick="saveNewExercise()">${t("Speichern", "Save")}</button>
+  <button onclick="loadEditWorkout()">${t("Zurück", "Back")}</button>
 `;
 }
 
@@ -58,7 +58,7 @@ function saveNewExercise() {
   workouts[selected] = currentExercises;
   saveWorkouts(workouts);
 
-  alert("Übung hinzugefügt!");
+  alert(t("Übung hinzugefügt!", "Exercise added!"));
 
   loadEditWorkout();
 }
@@ -69,11 +69,11 @@ function deleteWorkout() {
   let selected = document.getElementById("editSelect").value;
 
   if (!selected) {
-    alert("Bitte zuerst ein Workout auswählen!");
+    alert(t("Bitte zuerst ein Workout auswählen!", "Please choose a workout first!"));
     return;
   }
 
-  let confirmDelete = confirm(`Workout "${selected}" wirklich löschen?`);
+  let confirmDelete = confirm(t(`Workout "${selected}" wirklich löschen?`, `Really delete workout "${selected}"?`));
 
   if (!confirmDelete) return;
 
@@ -83,7 +83,7 @@ function deleteWorkout() {
 
   saveWorkouts(workouts);
 
-  alert("Workout gelöscht!");
+  alert(t("Workout gelöscht!", "Workout deleted!"));
 
   showEditMode(); // 🔥 UI neu laden
   loadWorkoutList(); // 🔥 Workout-Dropdown aktualisieren
@@ -129,7 +129,7 @@ function saveEditExercise(index) {
   workouts[selected] = currentExercises;
   saveWorkouts(workouts);
 
-  alert("Gespeichert!");
+  alert(t("Gespeichert!", "Saved!"));
 
   loadEditWorkout();
 }
@@ -148,18 +148,18 @@ function showEditMode() {
   }
 
   document.getElementById("editMode").innerHTML = `
-  <h4>Workout bearbeiten</h4>
+  <h4>${t("Workout bearbeiten", "Edit workout")}</h4>
 
   <select id="editSelect" onchange="loadEditWorkout()">
-    <option value="">Bitte wählen</option>
+    <option value="">${t("Bitte wählen", "Please choose")}</option>
     ${options}
   </select>
 
-  <button onclick="deleteWorkout()">Workout löschen</button>
+  <button onclick="deleteWorkout()">${t("Workout löschen", "Delete workout")}</button>
 
   <ul id="editList"></ul>
 
-  <button onclick="addExerciseToWorkout()">Neue Übung hinzufügen</button>
+  <button onclick="addExerciseToWorkout()">${t("Neue Übung hinzufügen", "Add new exercise")}</button>
 `;
 }
 
@@ -170,22 +170,22 @@ function openEditExercise(index) {
   let list = document.getElementById("editList");
 
   list.innerHTML = `
-  <h4>Übung bearbeiten</h4>
+  <h4>${t("Übung bearbeiten", "Edit exercise")}</h4>
 
-  <label>Übung</label><br>
+  <label>${t("Übung", "Exercise")}</label><br>
   <input id="edit_name" readonly onclick="openExercisePicker('edit_name')" value="${escapeHtml(ex.name)}"><br>
 
-  <label>Sätze</label><br>
+  <label>${t("Sätze", "Sets")}</label><br>
   <input id="edit_sets" type="number" min="1" value="${ex.sets}"><br>
 
   <label>Reps</label><br>
   <input id="edit_reps" type="number" min="1" value="${ex.reps}"><br>
 
-  <label>Gewicht</label><br>
+  <label>${t("Gewicht", "Weight")}</label><br>
   <input id="edit_weight" type="number" min="0" step="0.5" value="${ex.weight}"><br><br>
 
-  <button onclick="saveEditExercise(${index})">Speichern</button>
-  <button onclick="loadEditWorkout()">Zurück</button>
+  <button onclick="saveEditExercise(${index})">${t("Speichern", "Save")}</button>
+  <button onclick="loadEditWorkout()">${t("Zurück", "Back")}</button>
 `;
 }
 
@@ -211,8 +211,8 @@ function loadEditWorkout() {
     li.innerHTML = `
   ${escapeHtml(ex.name)} – ${ex.sets}x${ex.reps} (${ex.weight}kg)
 
-  <button onclick="openEditExercise(${index})">Bearbeiten</button>
-  <button onclick="deleteExercise(${index})">Löschen</button>
+  <button onclick="openEditExercise(${index})">${t("Bearbeiten", "Edit")}</button>
+  <button onclick="deleteExercise(${index})">${t("Löschen", "Delete")}</button>
 `;
 
     list.appendChild(li);

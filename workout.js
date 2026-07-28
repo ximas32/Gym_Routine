@@ -8,8 +8,8 @@ document.getElementById("workoutPage").innerHTML = `
 
   <div id="workoutSelectRow">
     <select id="workoutSelect" onchange="loadWorkout()"></select>
-    <button id="shareBtn" onclick="shareWorkout()" title="Workout teilen">📤</button>
-    <button id="importBtn" onclick="importSharedWorkout()" title="Geteiltes Workout importieren">📥</button>
+    <button id="shareBtn" onclick="shareWorkout()" title="${t("Workout teilen", "Share workout")}">📤</button>
+    <button id="importBtn" onclick="importSharedWorkout()" title="${t("Geteiltes Workout importieren", "Import shared workout")}">📥</button>
   </div>
 
   <ul id="workoutDisplay"></ul>
@@ -77,7 +77,7 @@ function loadWorkout() {
   // 👇 nichts gewählt
   if (!selected) {
     title.innerText = "Workouts";
-    display.innerHTML = "<p>Bitte wähle ein Workout aus</p>";
+    display.innerHTML = `<p>${t("Bitte wähle ein Workout aus", "Please choose a workout")}</p>`;
     return;
   }
 
@@ -96,7 +96,7 @@ function loadWorkout() {
     li.innerHTML = `
       <span>${done} ${escapeHtml(ex.name)} (${ex.sets}x${ex.reps} - ${ex.weight}kg)</span>
       <span class="workout-item-actions">
-        <button class="info-btn" data-name="${escapeHtml(ex.name)}" onclick="viewExerciseInfo(this.dataset.name)" title="Ausführung ansehen">ℹ️</button>
+        <button class="info-btn" data-name="${escapeHtml(ex.name)}" onclick="viewExerciseInfo(this.dataset.name)" title="${t("Ausführung ansehen", "View how-to")}">ℹ️</button>
         <button onclick="startExercise(${index})">Start</button>
       </span>
     `;
@@ -106,7 +106,7 @@ function loadWorkout() {
 
   // 👇 Finish Button
   let finishBtn = document.createElement("button");
-  finishBtn.innerText = "Workout beenden";
+  finishBtn.innerText = t("Workout beenden", "Finish workout");
   finishBtn.onclick = finishWorkout;
 
   display.appendChild(finishBtn);
@@ -135,12 +135,12 @@ function startExercise(index) {
   }
 
   let lastLine = last
-    ? `<p class="last-values">Letztes Mal (${formatDate(last.date)}): <b>${last.reps.join(" / ")}</b> @ ${last.weight}kg</p>`
+    ? `<p class="last-values">${t("Letztes Mal", "Last time")} (${formatDate(last.date)}): <b>${last.reps.join(" / ")}</b> @ ${last.weight}kg</p>`
     : "";
 
   // 💬 Kommentar vom letzten Mal als Erinnerung anzeigen
   let lastComment = last && last.comment
-    ? `<p class="last-comment">💬 letztes Mal: ${escapeHtml(last.comment)}</p>`
+    ? `<p class="last-comment">💬 ${t("letztes Mal", "last time")}: ${escapeHtml(last.comment)}</p>`
     : "";
 
   let inputs = "";
@@ -155,19 +155,19 @@ function startExercise(index) {
   display.innerHTML = `
     <h3>
       ${escapeHtml(exercise.name)} ${exercise.weight}kg
-      <button class="info-btn" data-name="${escapeHtml(exercise.name)}" onclick="viewExerciseInfo(this.dataset.name)" title="Ausführung ansehen">ℹ️</button>
+      <button class="info-btn" data-name="${escapeHtml(exercise.name)}" onclick="viewExerciseInfo(this.dataset.name)" title="${t("Ausführung ansehen", "View how-to")}">ℹ️</button>
     </h3>
-    <p>Ziel: ${exercise.sets}x${exercise.reps}</p>
+    <p>${t("Ziel", "Target")}: ${exercise.sets}x${exercise.reps}</p>
     ${lastLine}
     ${lastComment}
 
     ${inputs}
 
-    <label>Kommentar (optional)</label>
-    <input id="exComment" placeholder="z.B. Schulter zwickt, neue Bank…" value="${escapeHtml(currentSessionComments[index] || "")}">
+    <label>${t("Kommentar (optional)", "Comment (optional)")}</label>
+    <input id="exComment" placeholder="${t("z.B. Schulter zwickt, neue Bank…", "e.g. shoulder twinge, new bench…")}" value="${escapeHtml(currentSessionComments[index] || "")}">
 
-    <button onclick="saveExercise(${index})">Speichern</button>
-    <button onclick="backToWorkout()">Zurück</button>
+    <button onclick="saveExercise(${index})">${t("Speichern", "Save")}</button>
+    <button onclick="backToWorkout()">${t("Zurück", "Back")}</button>
   `;
 }
 
@@ -204,7 +204,10 @@ function saveExercise(index) {
     showToast("Stabil Bro! Weiter so!!");
 
     let newWeight = prompt(
-      `Ziel erreicht 💪\nAktuelles Gewicht: ${exercise.weight}kg\nNeues Gewicht eingeben:`,
+      t(
+        `Ziel erreicht 💪\nAktuelles Gewicht: ${exercise.weight}kg\nNeues Gewicht eingeben:`,
+        `Target reached 💪\nCurrent weight: ${exercise.weight}kg\nEnter new weight:`
+      ),
       exercise.weight
     );
 
@@ -232,14 +235,14 @@ function saveExercise(index) {
 
 function finishWorkout() {
   if (Object.keys(currentSession).length === 0) {
-    alert("Du hast keine Übungen gemacht!");
+    alert(t("Du hast keine Übungen gemacht!", "You haven't done any exercises!"));
     return;
   }
 
   let selected = document.getElementById("workoutSelect").value;
 
   if (!selected) {
-    alert("Kein Workout ausgewählt!");
+    alert(t("Kein Workout ausgewählt!", "No workout selected!"));
     return;
   }
 
@@ -273,7 +276,7 @@ function finishWorkout() {
 
   saveHistory(history);
 
-  alert(`Maschine brutal getraininert 💪\n+${pointsGained} Punkte! 🏆`);
+  alert(`Maschine brutal getraininert 💪\n+${pointsGained} ${t("Punkte", "points")}! 🏆`);
 
   currentSession = {};
   currentSessionWeights = {};

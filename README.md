@@ -17,6 +17,7 @@ Ein schlanker Workout-Tracker als **Progressive Web App (PWA)** — gebaut mit p
 - 🏆 **Punktesystem mit Leveln** — belohnt Konsistenz und Progression (siehe unten)
 - 🔥 **Kalender-Heatmap** — die letzten 2 Monate Trainingsaktivität, chronologisch nach Monat und Tag
 - 📋 **Trainings-Log** — jede Session nachschlagbar mit allen Übungen, Werten und Kommentaren
+- 🌍 **Deutsch / English** — Sprache im Zahnrad-Menü umschaltbar (Meme-Meldungen und Level-Titel bleiben bewusst Deutsch)
 - 🎨 **Anpassbare Farben** — Zahnrad oben rechts: Hintergrund, Schrift und Akzent frei wählbar (plus Presets); die übrigen Töne werden automatisch abgeleitet
 - 📤 **Workouts teilen** — als Link (die Daten stecken im Link selbst, kein Server nötig); Import per Link-Klick oder 📥-Button in der App
 - 💾 **Backup & Restore** — Export/Import als JSON-Datei, mit Erinnerung alle 14 Tage
@@ -63,6 +64,7 @@ Alle Daten liegen **nur auf dem Gerät** im `localStorage` (bei installierter PW
 | `bodyweight` | Körpergewichts-Einträge `{ date (ISO), kg }` |
 | `customExercises` | Eigene Übungsnamen für den Picker |
 | `theme` | Gewählte Farben `{ bg, text, accent }` |
+| `lang` | Gewählte Sprache (`de` / `en`) |
 | `lastBackup` / `lastBackupReminder` | Zeitstempel für die Backup-Erinnerung |
 
 **Backup:** „⬇️ Backup exportieren" lädt eine JSON-Datei herunter (Downloads-Ordner bzw. iOS „Dateien"-App). Import über „⬆️ Backup importieren".
@@ -75,8 +77,9 @@ Alle Daten liegen **nur auf dem Gerät** im `localStorage` (bei installierter PW
 |-------|---------|
 | `index.html` | Grundgerüst, Seiten-Container, Bottom-Navigation, PWA-Meta |
 | `app.js` | Seiten-Umschaltung, Service-Worker-Registrierung |
+| `i18n.js` | Zweisprachigkeit (Deutsch/English), `t()`-Helfer |
 | `storage.js` | localStorage-Wrapper, HTML-Escaping, Validierung, Datums-Migration, Backup |
-| `theme.js` | Anpassbare Farben, Einstellungs-Panel, Reset |
+| `theme.js` | Anpassbare Farben, Sprachwahl, Einstellungs-Panel, Reset |
 | `create.js` | Neues Workout anlegen |
 | `edit.js` | Workouts/Übungen bearbeiten und löschen |
 | `workout.js` | Training durchführen, Sätze speichern, Kommentare, progressive Overload |

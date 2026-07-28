@@ -117,7 +117,7 @@ function drawChart(data, oneRMData) {
   if (data.length === 0) {
     ctx.fillStyle = cLabel;
     ctx.font = "14px Arial";
-    ctx.fillText("Keine Daten vorhanden", 80, 100);
+    ctx.fillText(t("Keine Daten vorhanden", "No data yet"), 80, 100);
     return;
   }
 
@@ -202,7 +202,7 @@ function drawChart(data, oneRMData) {
 
   // 🔹 Legende
   ctx.fillStyle = cWeight;
-  ctx.fillText("Gewicht", canvas.width - 100, 20);
+  ctx.fillText(t("Gewicht", "Weight"), canvas.width - 100, 20);
 
   ctx.fillStyle = "#ff6b6b";
   ctx.fillText("1RM", canvas.width - 100, 40);

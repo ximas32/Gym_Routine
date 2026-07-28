@@ -8,8 +8,8 @@ let currentExercises = [];
 document.getElementById("createPage").innerHTML = `
   <h3>Workout</h3>
 
-  <button onclick="showCreateMode()">Neues Workout</button>
-  <button onclick="showEditMode()">Workout bearbeiten</button>
+  <button onclick="showCreateMode()">${t("Neues Workout", "New workout")}</button>
+  <button onclick="showEditMode()">${t("Workout bearbeiten", "Edit workout")}</button>
 
   <div id="createMode" class="hidden"></div>
   <div id="editMode" class="hidden"></div>
@@ -23,28 +23,28 @@ function showCreateMode() {
   currentExercises = [];
 
   document.getElementById("createMode").innerHTML = `
-  <h4>Neues Workout</h4>
+  <h4>${t("Neues Workout", "New workout")}</h4>
 
-  <label>Workout Name</label><br>
+  <label>${t("Workout Name", "Workout name")}</label><br>
   <input id="workoutName"><br><br>
 
-  <label>Übung</label><br>
-  <input id="exerciseName" readonly placeholder="Tippen zum Auswählen 📚" onclick="openExercisePicker('exerciseName')"><br>
+  <label>${t("Übung", "Exercise")}</label><br>
+  <input id="exerciseName" readonly placeholder="${t("Tippen zum Auswählen 📚", "Tap to choose 📚")}" onclick="openExercisePicker('exerciseName')"><br>
 
-  <label>Sätze</label><br>
+  <label>${t("Sätze", "Sets")}</label><br>
   <input id="sets" type="number" min="1"><br>
 
   <label>Reps</label><br>
   <input id="reps" type="number" min="1"><br>
 
-  <label>Gewicht</label><br>
+  <label>${t("Gewicht", "Weight")}</label><br>
   <input id="weight" type="number" min="0" step="0.5"><br><br>
 
-  <button onclick="addExercise()">Übung hinzufügen</button>
+  <button onclick="addExercise()">${t("Übung hinzufügen", "Add exercise")}</button>
 
   <ul id="exerciseList"></ul>
 
-  <button onclick="saveWorkout()">Speichern</button>
+  <button onclick="saveWorkout()">${t("Speichern", "Save")}</button>
 `;
 }
 
@@ -81,11 +81,11 @@ function saveWorkout() {
   let name = document.getElementById("workoutName").value.trim();
 
   if (!name) {
-    alert("Bitte Workout Name eingeben!");
+    alert(t("Bitte Workout Name eingeben!", "Please enter a workout name!"));
     return;
   }
   if (currentExercises.length === 0) {
-    alert("Bitte mindestens eine Übung hinzufügen!");
+    alert(t("Bitte mindestens eine Übung hinzufügen!", "Please add at least one exercise!"));
     return;
   }
 
@@ -93,7 +93,7 @@ function saveWorkout() {
 
   // ✅ Warnung, wenn ein Workout mit gleichem Namen existiert
   if (workouts[name]) {
-    let ok = confirm(`Workout "${name}" existiert schon. Überschreiben?`);
+    let ok = confirm(t(`Workout "${name}" existiert schon. Überschreiben?`, `Workout "${name}" already exists. Overwrite?`));
     if (!ok) return;
   }
 
@@ -101,6 +101,6 @@ function saveWorkout() {
 
   saveWorkouts(workouts);
 
-  alert("Gespeichert!");
+  alert(t("Gespeichert!", "Saved!"));
   loadWorkoutList();
 }

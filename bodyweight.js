@@ -1,11 +1,11 @@
 // ⚖️ Körpergewicht-Tracking (im Progress-Tab)
 document.getElementById("progressPage").insertAdjacentHTML("beforeend", `
   <div id="bodyweightSection">
-    <h4>Körpergewicht</h4>
+    <h4>${t("Körpergewicht", "Bodyweight")}</h4>
 
     <div id="bwRow">
       <input id="bwInput" type="number" min="20" max="300" step="0.1" placeholder="kg">
-      <button onclick="saveBodyweight()">Speichern</button>
+      <button onclick="saveBodyweight()">${t("Speichern", "Save")}</button>
     </div>
 
     <canvas id="bodyChart" width="320" height="180"></canvas>
@@ -21,7 +21,7 @@ function saveBodyweight() {
   let kg = Number(document.getElementById("bwInput").value);
 
   if (isNaN(kg) || kg < 20 || kg > 300) {
-    alert("Bitte gültiges Gewicht eingeben (20–300 kg)!");
+    alert(t("Bitte gültiges Gewicht eingeben (20–300 kg)!", "Please enter a valid weight (20–300 kg)!"));
     return;
   }
 
@@ -36,7 +36,7 @@ function saveBodyweight() {
   localStorage.setItem("bodyweight", JSON.stringify(entries));
 
   document.getElementById("bwInput").value = "";
-  showToast("Gewicht gespeichert! ⚖️");
+  showToast(t("Gewicht gespeichert! ⚖️", "Weight saved! ⚖️"));
   renderBodyweight();
 }
 
@@ -50,7 +50,7 @@ function renderBodyweight() {
 
   if (entries.length === 0) {
     canvas.style.display = "none";
-    info.innerText = "Noch kein Gewicht erfasst";
+    info.innerText = t("Noch kein Gewicht erfasst", "No weight recorded yet");
     return;
   }
 
@@ -59,10 +59,10 @@ function renderBodyweight() {
   let latest = entries[entries.length - 1];
   let diff = entries.length > 1 ? latest.kg - entries[0].kg : 0;
   let diffText = entries.length > 1
-    ? ` (${diff >= 0 ? "+" : ""}${diff.toFixed(1)} kg seit ${formatDate(entries[0].date)})`
+    ? ` (${diff >= 0 ? "+" : ""}${diff.toFixed(1)} kg ${t("seit", "since")} ${formatDate(entries[0].date)})`
     : "";
 
-  info.innerText = `Aktuell: ${latest.kg} kg — ${formatDate(latest.date)}${diffText}`;
+  info.innerText = `${t("Aktuell", "Current")}: ${latest.kg} kg — ${formatDate(latest.date)}${diffText}`;
 
   if (entries.length < 2) return; // Linie braucht 2 Punkte
 
