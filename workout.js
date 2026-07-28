@@ -20,6 +20,7 @@ document.getElementById("workoutPage").innerHTML = `
 
 // 🔥 aktuelle Session (Key = Übungs-Index, damit gleiche Namen nicht kollidieren)
 let currentSession = {};          // Index → Reps-Array
+let currentSessionWeights = {};   // Index → tatsächlich gestemmtes Gewicht
 let currentSessionComments = {};  // Index → Kommentartext
 let currentSessionWorkout = "";
 
@@ -68,6 +69,7 @@ function loadWorkout() {
   // 👇 anderes Workout gewählt → Session zurücksetzen
   if (selected !== currentSessionWorkout) {
     currentSession = {};
+    currentSessionWeights = {};
     currentSessionComments = {};
     currentSessionWorkout = selected;
   }
@@ -181,6 +183,9 @@ function saveExercise(index) {
   let selected = document.getElementById("workoutSelect").value;
   let exercise = workouts[selected][index];
 
+  // 👇 Gewicht, mit dem tatsächlich trainiert wurde (VOR einer möglichen Erhöhung)
+  let liftedWeight = exercise.weight;
+
   let results = [];
 
   // 👇 ZUERST Werte sammeln
@@ -215,6 +220,7 @@ function saveExercise(index) {
   }
 
   currentSession[index] = results;
+  currentSessionWeights[index] = liftedWeight; // 🔧 gestemmtes Gewicht, nicht das neue Ziel
 
   // 💬 Kommentar merken (leer = kein Eintrag)
   let comment = document.getElementById("exComment").value.trim();
@@ -246,7 +252,8 @@ function finishWorkout() {
   workoutData.forEach((ex, index) => {
     sessionData[ex.name] = {
       reps: currentSession[index] || [],
-      weight: ex.weight,
+      // 🔧 tatsächlich gestemmtes Gewicht (Fallback: aktuelles, falls nicht erfasst)
+      weight: currentSessionWeights[index] !== undefined ? currentSessionWeights[index] : ex.weight,
       target: ex.reps, // 🏆 Ziel mitspeichern für die Punkteberechnung
       sets: ex.sets,
       comment: currentSessionComments[index] || "" // 💬 optionaler Kommentar
@@ -269,6 +276,7 @@ function finishWorkout() {
   alert(`Maschine brutal getraininert 💪\n+${pointsGained} Punkte! 🏆`);
 
   currentSession = {};
+  currentSessionWeights = {};
   currentSessionComments = {};
   currentSessionWorkout = "";
 
