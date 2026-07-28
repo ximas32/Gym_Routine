@@ -1,6 +1,6 @@
 {
-  "name": "Gym Routine",
-  "short_name": "Gym",
+  "name": "Do you even lift bro?",
+  "short_name": "Lift Bro",
   "description": "Workout-Tracker mit Progress-Charts",
   "start_url": ".",
   "scope": ".",

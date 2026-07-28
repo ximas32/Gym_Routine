@@ -1,4 +1,4 @@
-# 🏋️ Gym Routine
+# 🏋️ Do you even lift bro?
 
 Ein schlanker Workout-Tracker als **Progressive Web App (PWA)** — gebaut mit purem HTML/CSS/JavaScript, ohne Framework, ohne Build-Tool, ohne Server.
 

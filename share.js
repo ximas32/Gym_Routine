@@ -50,7 +50,7 @@ async function shareWorkout() {
   // 📱 natives Teilen-Menü (WhatsApp, Signal, …)
   if (navigator.share) {
     try {
-      await navigator.share({ title: `Gym Routine: ${selected}`, url });
+      await navigator.share({ title: `Do you even lift bro? — ${selected}`, url });
       return;
     } catch (e) {
       if (e.name === "AbortError") return; // Nutzer hat abgebrochen
