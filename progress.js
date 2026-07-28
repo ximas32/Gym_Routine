@@ -27,6 +27,7 @@ let chartStepX = 0;
 let chartMin = 0;
 let chartRange = 1;
 let chartOneRM = [];
+let chartH = 220; // logische Chart-Höhe (für Highlight)
 
 
 // 🔹 Übungen laden
@@ -105,9 +106,9 @@ function loadProgress() {
 // 🔹 Chart zeichnen
 function drawChart(data, oneRMData) {
   let canvas = document.getElementById("progressChart");
-  let ctx = canvas.getContext("2d");
+  let { ctx, w, h } = fitCanvas(canvas, 320, 220); // 🖥️ scharf auf HiDPI
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, w, h);
 
   // 🎨 Farben aus dem aktuellen Theme lesen (strukturelle Farben passen sich an)
   let cGrid = cssVar("--border", "#33333f");
@@ -130,7 +131,7 @@ function drawChart(data, oneRMData) {
 
   let range = max - min;
 
-  let stepX = (canvas.width - padding * 2) / (data.length - 1 || 1);
+  let stepX = (w - padding * 2) / (data.length - 1 || 1);
 
   // 🔹 Grid + Labels
   let steps = 5;
@@ -138,16 +139,13 @@ function drawChart(data, oneRMData) {
   for (let i = 0; i <= steps; i++) {
     let value = min + (range / steps) * i;
 
-    let y =
-      canvas.height -
-      padding -
-      ((value - min) / range) * (canvas.height - padding * 2);
+    let y = h - padding - ((value - min) / range) * (h - padding * 2);
 
     // Grid
     ctx.beginPath();
     ctx.strokeStyle = cGrid;
     ctx.moveTo(padding, y);
-    ctx.lineTo(canvas.width - padding, y);
+    ctx.lineTo(w - padding, y);
     ctx.stroke();
 
     // Label
@@ -160,10 +158,7 @@ function drawChart(data, oneRMData) {
   ctx.beginPath();
   data.forEach((value, i) => {
     let x = padding + i * stepX;
-    let y =
-      canvas.height -
-      padding -
-      ((value - min) / range) * (canvas.height - padding * 2);
+    let y = h - padding - ((value - min) / range) * (h - padding * 2);
 
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
@@ -176,10 +171,7 @@ function drawChart(data, oneRMData) {
   ctx.beginPath();
   oneRMData.forEach((value, i) => {
     let x = padding + i * stepX;
-    let y =
-      canvas.height -
-      padding -
-      ((value - min) / range) * (canvas.height - padding * 2);
+    let y = h - padding - ((value - min) / range) * (h - padding * 2);
 
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
@@ -192,32 +184,29 @@ function drawChart(data, oneRMData) {
   ctx.fillStyle = cWeight;
   data.forEach((value, i) => {
     let x = padding + i * stepX;
-    let y =
-      canvas.height -
-      padding -
-      ((value - min) / range) * (canvas.height - padding * 2);
+    let y = h - padding - ((value - min) / range) * (h - padding * 2);
 
     ctx.fillRect(x - 3, y - 3, 6, 6);
   });
 
   // 🔹 Legende
   ctx.fillStyle = cWeight;
-  ctx.fillText(t("Gewicht", "Weight"), canvas.width - 100, 20);
+  ctx.fillText(t("Gewicht", "Weight"), w - 100, 20);
 
   ctx.fillStyle = "#ff6b6b";
-  ctx.fillText("1RM", canvas.width - 100, 40);
+  ctx.fillText("1RM", w - 100, 40);
 
   // 🔥 Achsen
   ctx.strokeStyle = cLabel;
 
   ctx.beginPath();
   ctx.moveTo(padding, padding);
-  ctx.lineTo(padding, canvas.height - padding);
+  ctx.lineTo(padding, h - padding);
   ctx.stroke();
 
   ctx.beginPath();
-  ctx.moveTo(padding, canvas.height - padding);
-  ctx.lineTo(canvas.width - padding, canvas.height - padding);
+  ctx.moveTo(padding, h - padding);
+  ctx.lineTo(w - padding, h - padding);
   ctx.stroke();
 
   // 🔥 speichern für Highlight
@@ -225,6 +214,7 @@ function drawChart(data, oneRMData) {
   chartStepX = stepX;
   chartMin = min;
   chartRange = range;
+  chartH = h;
 }
 
 
@@ -235,20 +225,20 @@ function highlightPoint() {
   if (index === "") return;
 
   let canvas = document.getElementById("progressChart");
-  let ctx = canvas.getContext("2d");
 
-  // neu zeichnen
+  // neu zeichnen (setzt den skalierten Kontext neu auf)
   drawChart(chartData, chartOneRM);
+  let ctx = canvas.getContext("2d");
 
   let x = chartPadding + index * chartStepX;
 
   let value = chartData[index];
 
   let y =
-    canvas.height -
+    chartH -
     chartPadding -
     ((value - chartMin) / chartRange) *
-      (canvas.height - chartPadding * 2);
+      (chartH - chartPadding * 2);
 
   // 🔥 Highlight
   ctx.beginPath();

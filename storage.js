@@ -35,6 +35,21 @@ function formatDate(isoString) {
   return date.toLocaleDateString(locale());
 }
 
+// 🖥️ Canvas scharf auf HiDPI-/Retina-Displays:
+// Interne Auflösung = Anzeigegröße × Pixeldichte, Kontext passend skaliert.
+// Danach wird in CSS-Pixeln (0..w, 0..h) gezeichnet und der Browser stellt es scharf dar.
+function fitCanvas(canvas, logicalW, logicalH) {
+  let dpr = window.devicePixelRatio || 1;
+  let cssW = canvas.clientWidth || logicalW;             // Anzeigebreite (0 wenn Tab versteckt → Fallback)
+  let cssH = Math.round(cssW * (logicalH / logicalW));   // Seitenverhältnis beibehalten
+  canvas.style.height = cssH + "px";
+  canvas.width = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  let ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w: cssW, h: cssH };
+}
+
 // ✅ Eingaben für eine Übung prüfen → Fehlertext oder null
 function validateExercise(name, sets, reps, weight) {
   if (!name) return t("Bitte Übungsname eingeben!", "Please enter an exercise name!");

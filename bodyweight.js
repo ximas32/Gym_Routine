@@ -44,9 +44,6 @@ function renderBodyweight() {
   let entries = getBodyweight();
   let canvas = document.getElementById("bodyChart");
   let info = document.getElementById("bwInfo");
-  let ctx = canvas.getContext("2d");
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (entries.length === 0) {
     canvas.style.display = "none";
@@ -64,6 +61,8 @@ function renderBodyweight() {
 
   info.innerText = `${t("Aktuell", "Current")}: ${latest.kg} kg — ${formatDate(latest.date)}${diffText}`;
 
+  let { ctx, w, h } = fitCanvas(canvas, 320, 180); // 🖥️ scharf auf HiDPI (leert auch das Canvas)
+
   if (entries.length < 2) return; // Linie braucht 2 Punkte
 
   // 🔹 Linien-Chart (letzte 40 Einträge)
@@ -74,9 +73,9 @@ function renderBodyweight() {
   let max = Math.max(...values) + 1;
   let min = Math.min(...values) - 1;
   let range = max - min || 1;
-  let stepX = (canvas.width - padding * 2) / (values.length - 1);
+  let stepX = (w - padding * 2) / (values.length - 1);
 
-  let toY = v => canvas.height - padding - ((v - min) / range) * (canvas.height - padding * 2);
+  let toY = v => h - padding - ((v - min) / range) * (h - padding * 2);
 
   // Grid + Labels
   for (let i = 0; i <= 4; i++) {
@@ -86,7 +85,7 @@ function renderBodyweight() {
     ctx.beginPath();
     ctx.strokeStyle = cssVar("--border", "#33333f");
     ctx.moveTo(padding, y);
-    ctx.lineTo(canvas.width - padding, y);
+    ctx.lineTo(w - padding, y);
     ctx.stroke();
 
     ctx.fillStyle = cssVar("--muted", "#9a9aa8");
