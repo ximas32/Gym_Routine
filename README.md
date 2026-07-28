@@ -13,7 +13,7 @@ Ein schlanker Workout-Tracker als **Progressive Web App (PWA)** — gebaut mit p
 - ℹ️ **Ausführung im Workout** — Info-Button pro Übung: Bibliotheks-Übung zeigt Fotos/Anleitung, eigene Übung öffnet die YouTube-Suche
 - 📈 **Progressive Overload** — Ziel erreicht? Die App schlägt vor, das Gewicht zu erhöhen
 - 📊 **Progress-Charts** — Gewicht + geschätztes 1RM (Epley) pro Übung, selbst gezeichnet auf Canvas
-- ⚖️ **Körpergewicht-Tracking** — ein Eintrag pro Tag, mit Verlaufs-Chart und Trend
+- 📏 **Mess-Tracker** — Körpergewicht plus beliebige eigene Kategorien (z.B. Armumfang, Taille, Körperfett) mit eigener Einheit und Kommentar (wo/wie gemessen); Verlaufs-Chart mit Datums-Dropdown und Highlight zum Durchspringen
 - 🏆 **Punktesystem mit Leveln** — belohnt Konsistenz und Progression (siehe unten)
 - 🔥 **Kalender-Heatmap** — die letzten 2 Monate Trainingsaktivität, chronologisch nach Monat und Tag
 - 📋 **Trainings-Log** — jede Session nachschlagbar mit allen Übungen, Werten und Kommentaren
@@ -61,7 +61,7 @@ Alle Daten liegen **nur auf dem Gerät** im `localStorage` (bei installierter PW
 |-----|--------|
 | `workouts` | Workouts mit Übungen `{ name, sets, reps, weight }` |
 | `history` | Abgeschlossene Trainings `{ date (ISO), workout, data }` (data enthält Reps, Gewicht, Kommentar) |
-| `bodyweight` | Körpergewichts-Einträge `{ date (ISO), kg }` |
+| `measures` | Mess-Kategorien `[{ id, builtin, name, unit, comment, entries: [{ date, value }] }]` |
 | `customExercises` | Eigene Übungsnamen für den Picker |
 | `theme` | Gewählte Farben `{ bg, text, accent }` |
 | `lang` | Gewählte Sprache (`de` / `en`) |
@@ -86,7 +86,7 @@ Alle Daten liegen **nur auf dem Gerät** im `localStorage` (bei installierter PW
 | `library.js` | Übungs-Picker (Bottom Sheet): Suche, Gruppen, Info-Ansicht, eigene Übungen |
 | `exercises.json` | Verschlankte Übungsdatenbank (873 Übungen, ~770 KB) |
 | `progress.js` | Gewicht/1RM-Chart pro Übung (Canvas) |
-| `bodyweight.js` | Körpergewicht erfassen + Chart |
+| `bodyweight.js` | Mess-Tracker: Kategorien (Körpergewicht + eigene), Eingabe, Chart mit Datums-Highlight |
 | `points.js` | Punkteberechnung und Level |
 | `stats.js` | Statistik-Kacheln, Heatmap, Trainings-Log |
 | `share.js` | Workout als Link kodieren/dekodieren, Teilen & Import |

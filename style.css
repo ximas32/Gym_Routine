@@ -249,26 +249,48 @@ li button {
 }
 
 /* ⚖️ Körpergewicht */
-#bodyweightSection {
+#measureSection {
   margin-top: 28px;
 }
 
-#bwRow {
+#measureSelect {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+#measureNewForm {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.measure-comment {
+  color: var(--muted);
+  font-size: 13px;
+  font-style: italic;
+  margin: 0 0 10px;
+  text-align: left;
+}
+
+#measureRow {
   display: flex;
   gap: 8px;
   margin-bottom: 12px;
 }
 
-#bwRow input {
+#measureRow input {
   flex: 1;
 }
 
-#bwRow button {
+#measureRow button {
   margin: 0;
   flex-shrink: 0;
 }
 
-#bodyChart {
+#measureChart {
   width: 100%;
   height: auto;
   background: var(--card);
@@ -276,7 +298,11 @@ li button {
   border-radius: var(--radius);
 }
 
-#bwInfo {
+#measureSessionSelect {
+  margin-top: 10px;
+}
+
+#measureInfo {
   color: var(--muted);
   font-size: 14px;
   margin-top: 8px;

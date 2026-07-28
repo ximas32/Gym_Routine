@@ -34,7 +34,7 @@ function showPage(page) {
   if (page === "progress") {
     loadExerciseList();
     loadProgress();
-    renderBodyweight();
+    refreshMeasures();
   }
 
   if (page === "stats") {

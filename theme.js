@@ -176,6 +176,7 @@ function resetProgress() {
 
   localStorage.removeItem("history");
   localStorage.removeItem("bodyweight");
+  localStorage.removeItem("measures");
 
   alert(t("Frisch geduscht, Nadel weg, neu gestartet! 💪", "Freshly showered, needle gone, restarted! 💪"));
   location.reload();
@@ -185,6 +186,6 @@ function resetProgress() {
 function refreshCharts() {
   if (!document.getElementById("progressPage").classList.contains("hidden")) {
     if (typeof loadProgress === "function") loadProgress();
-    if (typeof renderBodyweight === "function") renderBodyweight();
+    if (typeof loadMeasure === "function") loadMeasure();
   }
 }

@@ -84,7 +84,8 @@ migrateHistory();
 function exportData() {
   let data = {
     workouts: getWorkouts(),
-    history: getHistory()
+    history: getHistory(),
+    measures: JSON.parse(localStorage.getItem("measures") || "null")
   };
 
   let blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -159,6 +160,14 @@ function importData(event) {
     saveWorkouts(data.workouts);
     saveHistory(data.history);
     migrateHistory();
+
+    // Messungen: neues Format direkt übernehmen, altes bodyweight beim Laden migrieren
+    if (data.measures) {
+      localStorage.setItem("measures", JSON.stringify(data.measures));
+    } else {
+      localStorage.removeItem("measures");
+      if (data.bodyweight) localStorage.setItem("bodyweight", JSON.stringify(data.bodyweight));
+    }
 
     alert(t("Backup importiert!", "Backup imported!"));
     location.reload();
