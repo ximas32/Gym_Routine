@@ -17,6 +17,7 @@ function showPage(page) {
   document.getElementById("workoutPage").classList.add("hidden");
   document.getElementById("progressPage").classList.add("hidden");
   document.getElementById("statsPage").classList.add("hidden");
+  document.getElementById("leaderboardPage").classList.add("hidden");
 
   document.getElementById(page + "Page").classList.remove("hidden");
 
@@ -39,5 +40,9 @@ function showPage(page) {
 
   if (page === "stats") {
     loadStats();
+  }
+
+  if (page === "leaderboard") {
+    loadLeaderboard();
   }
 }

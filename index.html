@@ -29,6 +29,7 @@
   <div id="workoutPage"></div>
   <div id="progressPage" class="hidden"></div>
   <div id="statsPage" class="hidden"></div>
+  <div id="leaderboardPage" class="hidden"></div>
 
   <!-- 💾 Backup -->
   <div id="dataBar">
@@ -44,6 +45,7 @@
   <button id="nav-workout" class="nav-btn active" onclick="showPage('workout')">🏋️<span>Workout</span></button>
   <button id="nav-progress" class="nav-btn" onclick="showPage('progress')">📈<span>Progress</span></button>
   <button id="nav-stats" class="nav-btn" onclick="showPage('stats')">📊<span>Statistik</span></button>
+  <button id="nav-leaderboard" class="nav-btn" onclick="showPage('leaderboard')">🏆<span>Rang</span></button>
 </nav>
 
 <script src="i18n.js"></script>
@@ -59,6 +61,13 @@
 <script src="bodyweight.js"></script>
 <script src="points.js"></script>
 <script src="stats.js"></script>
+
+<!-- 🏆 Leaderboard (Firebase) -->
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+<script src="leaderboard.js"></script>
+
 <script src="app.js"></script>
 
 </body>

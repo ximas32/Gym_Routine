@@ -28,7 +28,8 @@ function applyStaticI18n() {
     "nav-create": t("Erstellen", "Create"),
     "nav-workout": t("Workout", "Workout"),
     "nav-progress": t("Progress", "Progress"),
-    "nav-stats": t("Statistik", "Stats")
+    "nav-stats": t("Statistik", "Stats"),
+    "nav-leaderboard": t("Rang", "Ranking")
   };
   for (let id in navLabels) {
     let span = document.querySelector("#" + id + " span");

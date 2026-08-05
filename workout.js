@@ -276,6 +276,9 @@ function finishWorkout() {
 
   saveHistory(history);
 
+  // 🏆 Leaderboard-Eintrag automatisch aktualisieren (falls eingerichtet)
+  if (typeof pushLeaderboard === "function") pushLeaderboard();
+
   alert(`Maschine brutal getraininert 💪\n+${pointsGained} ${t("Punkte", "points")}! 🏆`);
 
   currentSession = {};
