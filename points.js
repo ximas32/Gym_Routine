@@ -28,10 +28,16 @@ function computePoints(history) {
 
       pts += 2;
 
-      // Ziel erreicht (Ziel wird seit Punkte-Update mitgespeichert)
-      if (ex.target && reps.length >= (ex.sets || reps.length) && reps.every(r => r >= ex.target)) {
-        pts += 5;
+      // Ziel erreicht
+      let targetOk;
+      if (ex.custom && Array.isArray(ex.steps)) {
+        // Drop-Set: jeder Satz muss seine eigenen Ziel-Reps erreichen
+        targetOk = ex.steps.length === reps.length && reps.every((r, i) => r >= ex.steps[i].reps);
+      } else {
+        // regulär (Ziel wird seit Punkte-Update mitgespeichert)
+        targetOk = ex.target && reps.length >= (ex.sets || reps.length) && reps.every(r => r >= ex.target);
       }
+      if (targetOk) pts += 5;
 
       // Gewicht erhöht
       if (lastWeight[name] !== undefined && ex.weight > lastWeight[name]) {

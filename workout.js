@@ -19,10 +19,12 @@ document.getElementById("workoutPage").innerHTML = `
 `;
 
 // 🔥 aktuelle Session (Key = Übungs-Index, damit gleiche Namen nicht kollidieren)
-let currentSession = {};          // Index → Reps-Array
-let currentSessionWeights = {};   // Index → tatsächlich gestemmtes Gewicht
+let currentSession = {};          // Index → Reps-Array (pro Satz)
+let currentSessionWeights = {};   // Index → tatsächlich gestemmtes Gewicht (regulär)
+let currentSessionSteps = {};     // Index → gestemmte Sätze [{weight,reps}] (custom/Drop-Sets)
 let currentSessionComments = {};  // Index → Kommentartext
 let currentSessionWorkout = "";
+let pendingSession = null;        // zwischengespeicherte Session während des Overload-Formulars
 
 
 // ✅ Dropdown laden (Auswahl bleibt erhalten)
@@ -70,6 +72,7 @@ function loadWorkout() {
   if (selected !== currentSessionWorkout) {
     currentSession = {};
     currentSessionWeights = {};
+    currentSessionSteps = {};
     currentSessionComments = {};
     currentSessionWorkout = selected;
   }
@@ -93,8 +96,12 @@ function loadWorkout() {
 
     let done = currentSession[index] ? "✅" : "";
 
+    let summary = (ex.custom && Array.isArray(ex.steps))
+      ? ex.steps.map(s => `${s.weight}×${s.reps}`).join(" / ")
+      : `${ex.sets}x${ex.reps} - ${ex.weight}kg`;
+
     li.innerHTML = `
-      <span>${done} ${escapeHtml(ex.name)} (${ex.sets}x${ex.reps} - ${ex.weight}kg)</span>
+      <span>${done} ${escapeHtml(ex.name)} (${summary})</span>
       <span class="workout-item-actions">
         <button class="info-btn" data-name="${escapeHtml(ex.name)}" onclick="viewExerciseInfo(this.dataset.name)" title="${t("Ausführung ansehen", "View how-to")}">ℹ️</button>
         <button onclick="startExercise(${index})">Start</button>
@@ -129,14 +136,24 @@ function startExercise(index) {
   for (let i = history.length - 1; i >= 0; i--) {
     let data = history[i].data && history[i].data[exercise.name];
     if (data && data.reps && data.reps.length > 0) {
-      last = { reps: data.reps, weight: data.weight, date: history[i].date, comment: data.comment };
+      last = { ...data, date: history[i].date };
       break;
     }
   }
 
-  let lastLine = last
-    ? `<p class="last-values">${t("Letztes Mal", "Last time")} (${formatDate(last.date)}): <b>${last.reps.join(" / ")}</b> @ ${last.weight}kg</p>`
-    : "";
+  let isCustom = exercise.custom && Array.isArray(exercise.steps);
+
+  // 👇 letzte Werte anzeigen (custom: pro Satz Gewicht×Reps)
+  let lastLine = "";
+  if (last) {
+    let lastStr;
+    if (last.custom && Array.isArray(last.steps)) {
+      lastStr = last.steps.map((st, i) => `${st.weight}×${(last.reps && last.reps[i] != null) ? last.reps[i] : "–"}`).join(" / ");
+    } else {
+      lastStr = `${last.reps.join(" / ")} @ ${last.weight}kg`;
+    }
+    lastLine = `<p class="last-values">${t("Letztes Mal", "Last time")} (${formatDate(last.date)}): <b>${lastStr}</b></p>`;
+  }
 
   // 💬 Kommentar vom letzten Mal als Erinnerung anzeigen
   let lastComment = last && last.comment
@@ -144,20 +161,31 @@ function startExercise(index) {
     : "";
 
   let inputs = "";
-
-  for (let i = 0; i < exercise.sets; i++) {
-    inputs += `
-      Satz ${i + 1}:
-      <input type="number" id="set_${i}" min="0" placeholder="Reps"><br>
-    `;
+  if (isCustom) {
+    exercise.steps.forEach((s, i) => {
+      inputs += `
+        ${t("Satz", "Set")} ${i + 1}: ${s.weight}kg – ${t("Ziel", "Target")} ${s.reps}
+        <input type="number" id="set_${i}" min="0" placeholder="Reps"><br>
+      `;
+    });
+  } else {
+    for (let i = 0; i < exercise.sets; i++) {
+      inputs += `
+        ${t("Satz", "Set")} ${i + 1}:
+        <input type="number" id="set_${i}" min="0" placeholder="Reps"><br>
+      `;
+    }
   }
+
+  let titleWeight = isCustom ? "" : ` ${exercise.weight}kg`;
+  let targetLine = isCustom ? "" : `<p>${t("Ziel", "Target")}: ${exercise.sets}x${exercise.reps}</p>`;
 
   display.innerHTML = `
     <h3>
-      ${escapeHtml(exercise.name)} ${exercise.weight}kg
+      ${escapeHtml(exercise.name)}${titleWeight}
       <button class="info-btn" data-name="${escapeHtml(exercise.name)}" onclick="viewExerciseInfo(this.dataset.name)" title="${t("Ausführung ansehen", "View how-to")}">ℹ️</button>
     </h3>
-    <p>${t("Ziel", "Target")}: ${exercise.sets}x${exercise.reps}</p>
+    ${targetLine}
     ${lastLine}
     ${lastComment}
 
@@ -182,6 +210,13 @@ function saveExercise(index) {
   let workouts = getWorkouts();
   let selected = document.getElementById("workoutSelect").value;
   let exercise = workouts[selected][index];
+
+  let comment = document.getElementById("exComment").value.trim();
+
+  // 🔀 Custom / Drop-Sets: eigener Ablauf
+  if (exercise.custom && Array.isArray(exercise.steps)) {
+    return saveCustomExercise(index, exercise, comment);
+  }
 
   // 👇 Gewicht, mit dem tatsächlich trainiert wurde (VOR einer möglichen Erhöhung)
   let liftedWeight = exercise.weight;
@@ -222,14 +257,86 @@ function saveExercise(index) {
     showToast("Stabil Bro!");
   }
 
-  currentSession[index] = results;
   currentSessionWeights[index] = liftedWeight; // 🔧 gestemmtes Gewicht, nicht das neue Ziel
 
-  // 💬 Kommentar merken (leer = kein Eintrag)
-  let comment = document.getElementById("exComment").value.trim();
+  finalizeSession(index, results, comment);
+}
+
+// 🔀 Custom-Übung speichern: Reps pro Satz sammeln, Ziel prüfen, ggf. Gewichte anpassen
+function saveCustomExercise(index, exercise, comment) {
+  // Snapshot der gestemmten Sätze (VOR einer möglichen Erhöhung)
+  let lifted = exercise.steps.map(s => ({ weight: s.weight, reps: s.reps }));
+  currentSessionSteps[index] = lifted;
+
+  let results = [];
+  for (let i = 0; i < exercise.steps.length; i++) {
+    let v = Number(document.getElementById(`set_${i}`).value);
+    if (isNaN(v) || v < 0) v = 0;
+    results.push(v);
+  }
+
+  let targetReached = exercise.steps.every((s, i) => results[i] >= s.reps);
+
+  if (targetReached) {
+    showToast("Stabil Bro! Weiter so!!");
+    // Overload-Formular: neue Gewichte für alle Sätze
+    pendingSession = { index, results, comment };
+    showDropOverloadForm(index, exercise);
+    return; // finalisiert erst nach dem Formular
+  }
+
+  showToast("Stabil Bro!");
+  finalizeSession(index, results, comment);
+}
+
+// 🔀 Formular: neue Gewichte für jeden Satz (Drop-Set) eingeben
+function showDropOverloadForm(index, exercise) {
+  let rows = exercise.steps.map((s, i) => `
+    <div class="step-row">
+      <span class="step-n">${i + 1}.</span>
+      <input type="number" class="ov-weight" min="0" step="0.5" value="${s.weight}">
+      <span class="step-unit">kg × ${s.reps}</span>
+    </div>`).join("");
+
+  document.getElementById("workoutDisplay").innerHTML = `
+    <h3>${t("Ziel erreicht 💪", "Target reached 💪")}</h3>
+    <p>${t("Neue Gewichte für die Sätze:", "New weights for the sets:")}</p>
+    ${rows}
+    <button onclick="applyDropWeights(${index})">${t("Übernehmen", "Apply")}</button>
+    <button onclick="skipDropWeights()">${t("Überspringen", "Skip")}</button>
+  `;
+}
+
+// 🔀 neue Gewichte übernehmen → in die Übungsdefinition schreiben
+function applyDropWeights(index) {
+  let workouts = getWorkouts();
+  let selected = document.getElementById("workoutSelect").value;
+
+  [...document.querySelectorAll(".ov-weight")].forEach((inp, i) => {
+    let w = Number(inp.value);
+    if (!isNaN(w) && w >= 0 && workouts[selected][index].steps[i]) {
+      workouts[selected][index].steps[i].weight = w;
+    }
+  });
+  saveWorkouts(workouts);
+
+  let p = pendingSession;
+  pendingSession = null;
+  finalizeSession(p.index, p.results, p.comment);
+}
+
+// 🔀 Gewichtsanpassung überspringen
+function skipDropWeights() {
+  let p = pendingSession;
+  pendingSession = null;
+  finalizeSession(p.index, p.results, p.comment);
+}
+
+// Session-Eintrag für eine Übung festhalten und zurück zur Übersicht
+function finalizeSession(index, results, comment) {
+  currentSession[index] = results;
   if (comment) currentSessionComments[index] = comment;
   else delete currentSessionComments[index];
-
   backToWorkout();
 }
 
@@ -253,14 +360,28 @@ function finishWorkout() {
   let sessionData = {};
 
   workoutData.forEach((ex, index) => {
-    sessionData[ex.name] = {
-      reps: currentSession[index] || [],
-      // 🔧 tatsächlich gestemmtes Gewicht (Fallback: aktuelles, falls nicht erfasst)
-      weight: currentSessionWeights[index] !== undefined ? currentSessionWeights[index] : ex.weight,
-      target: ex.reps, // 🏆 Ziel mitspeichern für die Punkteberechnung
-      sets: ex.sets,
-      comment: currentSessionComments[index] || "" // 💬 optionaler Kommentar
-    };
+    if (ex.custom && Array.isArray(ex.steps)) {
+      // Drop-Set: gestemmte Sätze (Snapshot vor Erhöhung), sonst aktuelle Definition
+      let steps = currentSessionSteps[index] || ex.steps.map(s => ({ weight: s.weight, reps: s.reps }));
+      let repWeight = steps.length ? Math.max(...steps.map(s => s.weight)) : 0;
+      sessionData[ex.name] = {
+        custom: true,
+        steps: steps,
+        reps: currentSession[index] || [],
+        weight: repWeight, // 🏆 repräsentativ (schwerster Satz) für Chart & Punkte
+        sets: steps.length,
+        comment: currentSessionComments[index] || ""
+      };
+    } else {
+      sessionData[ex.name] = {
+        reps: currentSession[index] || [],
+        // 🔧 tatsächlich gestemmtes Gewicht (Fallback: aktuelles, falls nicht erfasst)
+        weight: currentSessionWeights[index] !== undefined ? currentSessionWeights[index] : ex.weight,
+        target: ex.reps, // 🏆 Ziel mitspeichern für die Punkteberechnung
+        sets: ex.sets,
+        comment: currentSessionComments[index] || "" // 💬 optionaler Kommentar
+      };
+    }
   });
 
   // 🏆 Punkte für diese Session = Differenz vorher/nachher
@@ -283,6 +404,7 @@ function finishWorkout() {
 
   currentSession = {};
   currentSessionWeights = {};
+  currentSessionSteps = {};
   currentSessionComments = {};
   currentSessionWorkout = "";
 

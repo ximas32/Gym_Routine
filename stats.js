@@ -168,11 +168,19 @@ function loadTrainingLog() {
     let done = Object.entries(session.data).filter(([, ex]) => (ex.reps || []).length > 0);
 
     let details = Object.entries(session.data).map(([name, ex]) => {
-      let reps = (ex.reps || []).length ? ex.reps.join(" / ") : "–";
       let comment = ex.comment
         ? `<div class="log-comment">💬 ${escapeHtml(ex.comment)}</div>`
         : "";
-      return `<div class="log-exercise">${escapeHtml(name)}: ${reps} @ ${ex.weight}kg${comment}</div>`;
+
+      let body;
+      if (ex.custom && Array.isArray(ex.steps)) {
+        // Drop-Set: pro Satz Gewicht×tatsächliche Reps
+        body = ex.steps.map((s, i) => `${s.weight}×${(ex.reps && ex.reps[i] != null) ? ex.reps[i] : "–"}`).join(" / ");
+      } else {
+        let reps = (ex.reps || []).length ? ex.reps.join(" / ") : "–";
+        body = `${reps} @ ${ex.weight}kg`;
+      }
+      return `<div class="log-exercise">${escapeHtml(name)}: ${body}${comment}</div>`;
     }).join("");
 
     let dateLabel = new Date(session.date);

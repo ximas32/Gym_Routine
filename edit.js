@@ -17,21 +17,12 @@ function addExerciseToWorkout() {
   list.innerHTML = `
   <h4>${t("Neue Übung", "New exercise")}</h4>
 
-  <label>${t("Übung", "Exercise")}</label><br>
-  <input id="new_name" readonly placeholder="${t("Tippen zum Auswählen 📚", "Tap to choose 📚")}" onclick="openExercisePicker('new_name')"><br>
-
-  <label>${t("Sätze", "Sets")}</label><br>
-  <input id="new_sets" type="number" min="1"><br>
-
-  <label>Reps</label><br>
-  <input id="new_reps" type="number" min="1"><br>
-
-  <label>${t("Gewicht", "Weight")}</label><br>
-  <input id="new_weight" type="number" min="0" step="0.5"><br><br>
+  ${exerciseFormHtml()}
 
   <button onclick="saveNewExercise()">${t("Speichern", "Save")}</button>
   <button onclick="loadEditWorkout()">${t("Zurück", "Back")}</button>
 `;
+  initExerciseForm();
 }
 
 // 🔹 neue Übung validieren und ans Workout anhängen
@@ -39,19 +30,8 @@ function saveNewExercise() {
   let selected = document.getElementById("editSelect").value;
   let workouts = getWorkouts();
 
-  let newExercise = {
-    name: document.getElementById("new_name").value.trim(),
-    sets: Number(document.getElementById("new_sets").value),
-    reps: Number(document.getElementById("new_reps").value),
-    weight: Number(document.getElementById("new_weight").value)
-  };
-
-  // ✅ Eingaben prüfen
-  let error = validateExercise(newExercise.name, newExercise.sets, newExercise.reps, newExercise.weight);
-  if (error) {
-    alert(error);
-    return;
-  }
+  let newExercise = readExerciseForm();
+  if (!newExercise) return;
 
   currentExercises.push(newExercise);
 
@@ -110,19 +90,8 @@ function saveEditExercise(index) {
   let selected = document.getElementById("editSelect").value;
   let workouts = getWorkouts();
 
-  let updated = {
-    name: document.getElementById("edit_name").value.trim(),
-    sets: Number(document.getElementById("edit_sets").value),
-    reps: Number(document.getElementById("edit_reps").value),
-    weight: Number(document.getElementById("edit_weight").value)
-  };
-
-  // ✅ Eingaben prüfen
-  let error = validateExercise(updated.name, updated.sets, updated.reps, updated.weight);
-  if (error) {
-    alert(error);
-    return;
-  }
+  let updated = readExerciseForm();
+  if (!updated) return;
 
   currentExercises[index] = updated;
 
@@ -139,6 +108,7 @@ function saveEditExercise(index) {
 function showEditMode() {
   document.getElementById("editMode").classList.remove("hidden");
   document.getElementById("createMode").classList.add("hidden");
+  document.getElementById("createMode").innerHTML = ""; // 🔧 kein doppeltes Formular (gleiche IDs)
 
   let workouts = getWorkouts();
 
@@ -172,21 +142,12 @@ function openEditExercise(index) {
   list.innerHTML = `
   <h4>${t("Übung bearbeiten", "Edit exercise")}</h4>
 
-  <label>${t("Übung", "Exercise")}</label><br>
-  <input id="edit_name" readonly onclick="openExercisePicker('edit_name')" value="${escapeHtml(ex.name)}"><br>
-
-  <label>${t("Sätze", "Sets")}</label><br>
-  <input id="edit_sets" type="number" min="1" value="${ex.sets}"><br>
-
-  <label>Reps</label><br>
-  <input id="edit_reps" type="number" min="1" value="${ex.reps}"><br>
-
-  <label>${t("Gewicht", "Weight")}</label><br>
-  <input id="edit_weight" type="number" min="0" step="0.5" value="${ex.weight}"><br><br>
+  ${exerciseFormHtml(ex)}
 
   <button onclick="saveEditExercise(${index})">${t("Speichern", "Save")}</button>
   <button onclick="loadEditWorkout()">${t("Zurück", "Back")}</button>
 `;
+  initExerciseForm(ex);
 }
 
 
@@ -209,7 +170,7 @@ function loadEditWorkout() {
     let li = document.createElement("li");
 
     li.innerHTML = `
-  ${escapeHtml(ex.name)} – ${ex.sets}x${ex.reps} (${ex.weight}kg)
+  ${escapeHtml(exerciseSummary(ex))}
 
   <button onclick="openEditExercise(${index})">${t("Bearbeiten", "Edit")}</button>
   <button onclick="deleteExercise(${index})">${t("Löschen", "Delete")}</button>

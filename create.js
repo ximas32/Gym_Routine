@@ -19,6 +19,7 @@ document.getElementById("createPage").innerHTML = `
 function showCreateMode() {
   document.getElementById("createMode").classList.remove("hidden");
   document.getElementById("editMode").classList.add("hidden");
+  document.getElementById("editMode").innerHTML = ""; // 🔧 kein doppeltes Formular (gleiche IDs)
 
   currentExercises = [];
 
@@ -28,17 +29,7 @@ function showCreateMode() {
   <label>${t("Workout Name", "Workout name")}</label><br>
   <input id="workoutName"><br><br>
 
-  <label>${t("Übung", "Exercise")}</label><br>
-  <input id="exerciseName" readonly placeholder="${t("Tippen zum Auswählen 📚", "Tap to choose 📚")}" onclick="openExercisePicker('exerciseName')"><br>
-
-  <label>${t("Sätze", "Sets")}</label><br>
-  <input id="sets" type="number" min="1"><br>
-
-  <label>Reps</label><br>
-  <input id="reps" type="number" min="1"><br>
-
-  <label>${t("Gewicht", "Weight")}</label><br>
-  <input id="weight" type="number" min="0" step="0.5"><br><br>
+  <div id="exFormBox">${exerciseFormHtml()}</div>
 
   <button onclick="addExercise()">${t("Übung hinzufügen", "Add exercise")}</button>
 
@@ -46,34 +37,26 @@ function showCreateMode() {
 
   <button onclick="saveWorkout()">${t("Speichern", "Save")}</button>
 `;
+  initExerciseForm();
 }
 
-// 🔹 Übung aus den Eingabefeldern in die Liste übernehmen
+// 🔹 Übung aus dem Formular in die Liste übernehmen
 function addExercise() {
-  let name = document.getElementById("exerciseName").value.trim();
-  let sets = Number(document.getElementById("sets").value);
-  let reps = Number(document.getElementById("reps").value);
-  let weight = Number(document.getElementById("weight").value);
+  let ex = readExerciseForm();
+  if (!ex) return;
 
-  // ✅ Eingaben prüfen
-  let error = validateExercise(name, sets, reps, weight);
-  if (error) {
-    alert(error);
-    return;
-  }
+  currentExercises.push(ex);
+  renderCreateList();
 
-  currentExercises.push({ name, sets, reps, weight });
+  // 👇 Formular für die nächste Übung zurücksetzen
+  document.getElementById("exFormBox").innerHTML = exerciseFormHtml();
+  initExerciseForm();
+}
 
-  let li = document.createElement("li");
-  li.innerText = `${name} - ${sets}x${reps} - ${weight}kg`;
-  document.getElementById("exerciseList").appendChild(li);
-
-  // 👇 Felder leeren für die nächste Übung
-  document.getElementById("exerciseName").value = "";
-  document.getElementById("sets").value = "";
-  document.getElementById("reps").value = "";
-  document.getElementById("weight").value = "";
-  document.getElementById("exerciseName").focus();
+// 🔹 Übungsliste im Erstellen-Modus rendern
+function renderCreateList() {
+  document.getElementById("exerciseList").innerHTML =
+    currentExercises.map(ex => `<li>${escapeHtml(exerciseSummary(ex))}</li>`).join("");
 }
 
 // 🔹 Workout unter seinem Namen in localStorage ablegen

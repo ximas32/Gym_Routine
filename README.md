@@ -6,7 +6,7 @@ Ein schlanker Workout-Tracker als **Progressive Web App (PWA)** — gebaut mit p
 
 ## Features
 
-- 📝 **Workouts erstellen & bearbeiten** — Übungen mit Sätzen, Reps und Gewicht
+- 📝 **Workouts erstellen & bearbeiten** — Übungen mit Sätzen, Reps und Gewicht; optional **individuelle Sätze** (Drop-Sets, Pyramiden) mit eigenem Gewicht + Reps pro Satz
 - 📚 **Übungsbibliothek** — 873 Übungen ([free-exercise-db](https://github.com/yuhonas/free-exercise-db)), gruppiert nach Muskelgruppen, mit Suche, Fotos, Anleitung und YouTube-Link zur Ausführung; eigene Übungen jederzeit per Freitext
 - 🏋️ **Training durchführen** — Reps pro Satz eintragen, letzte Werte werden angezeigt („Letztes Mal: 8/8/7 @ 75kg")
 - 💬 **Kommentar pro Übung** — optionale Notiz während des Trainings, erscheint im Log und beim nächsten Mal als Erinnerung
@@ -82,6 +82,7 @@ Alle Daten liegen **nur auf dem Gerät** im `localStorage` (bei installierter PW
 | `theme.js` | Anpassbare Farben, Sprachwahl, Einstellungs-Panel, Reset |
 | `create.js` | Neues Workout anlegen |
 | `edit.js` | Workouts/Übungen bearbeiten und löschen |
+| `exform.js` | Gemeinsames Übungs-Formular (regulär + individuelle Sätze/Drop-Sets) |
 | `workout.js` | Training durchführen, Sätze speichern, Kommentare, progressive Overload |
 | `library.js` | Übungs-Picker (Bottom Sheet): Suche, Gruppen, Info-Ansicht, eigene Übungen |
 | `exercises.json` | Verschlankte Übungsdatenbank (873 Übungen, ~770 KB) |
