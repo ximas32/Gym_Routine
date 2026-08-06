@@ -1,6 +1,6 @@
 # 🏋️ Do you even lift bro?
 
-Ein schlanker Workout-Tracker als **Progressive Web App (PWA)** — gebaut mit purem HTML/CSS/JavaScript, ohne Framework, ohne Build-Tool, ohne Server.
+Ein schlanker Workout-Tracker als **Progressive Web App (PWA)** — gebaut mit purem HTML/CSS/JavaScript, ohne Framework und ohne Build-Tool. Läuft komplett lokal; nur das optionale Leaderboard nutzt Firebase (per CDN eingebunden, kein npm/Bundler).
 
 **Live:** https://ximas32.github.io/Gym_Routine/
 
@@ -20,8 +20,9 @@ Ein schlanker Workout-Tracker als **Progressive Web App (PWA)** — gebaut mit p
 - 🌍 **Deutsch / English** — Sprache im Zahnrad-Menü umschaltbar (Meme-Meldungen und Level-Titel bleiben bewusst Deutsch)
 - 🎨 **Anpassbare Farben** — Zahnrad oben rechts: Hintergrund, Schrift und Akzent frei wählbar (plus Presets); die übrigen Töne werden automatisch abgeleitet
 - 📤 **Workouts teilen** — als Link (die Daten stecken im Link selbst, kein Server nötig); Import per Link-Klick oder 📥-Button in der App
+- 🏆 **Freundes-Leaderboard** — optionaler Tab (Firebase): Rang, Name, Level + Titel, Punkte und Trainings dieses Jahr; aktualisiert sich automatisch nach jedem Training
 - 💾 **Backup & Restore** — Export/Import als JSON-Datei, mit Erinnerung alle 14 Tage
-- 💉 **Zurücksetzen** — Trainings & Körpergewicht auf einen Schlag löschen (Workouts bleiben erhalten)
+- 💉 **Zurücksetzen** — Trainings & Messwerte auf einen Schlag löschen (Workouts bleiben erhalten)
 - 📱 **Offline-fähig** — Service Worker cacht die komplette App inkl. Übungsbibliothek
 
 ## Installation als App
@@ -55,21 +56,33 @@ Mit gesammelten Punkten steigst du im Level auf; jedes Level trägt einen eigene
 
 ## Datenspeicherung
 
-Alle Daten liegen **nur auf dem Gerät** im `localStorage` (bei installierter PWA im app-eigenen Speicher). Nichts wird an einen Server geschickt.
+Alle Trainingsdaten liegen **nur auf dem Gerät** im `localStorage` (bei installierter PWA im app-eigenen Speicher). Einzige Ausnahme: das optionale [Leaderboard](#leaderboard-optional) lädt deinen Anzeigenamen + Stats zu Firebase.
 
 | Key | Inhalt |
 |-----|--------|
-| `workouts` | Workouts mit Übungen `{ name, sets, reps, weight }` |
+| `workouts` | Workouts mit Übungen `{ name, sets, reps, weight }` bzw. `{ name, custom, steps: [{ weight, reps }] }` (Drop-Sets) |
 | `history` | Abgeschlossene Trainings `{ date (ISO), workout, data }` (data enthält Reps, Gewicht, Kommentar) |
 | `measures` | Mess-Kategorien `[{ id, builtin, name, unit, comment, entries: [{ date, value }] }]` |
 | `customExercises` | Eigene Übungsnamen für den Picker |
 | `theme` | Gewählte Farben `{ bg, text, accent }` |
 | `lang` | Gewählte Sprache (`de` / `en`) |
+| `nickname` | Anzeigename fürs Leaderboard |
 | `lastBackup` / `lastBackupReminder` | Zeitstempel für die Backup-Erinnerung |
 
 **Backup:** „⬇️ Backup exportieren" lädt eine JSON-Datei herunter (Downloads-Ordner bzw. iOS „Dateien"-App). Import über „⬆️ Backup importieren".
 
-**Zurücksetzen:** „💉 Neustart mit Anabolika" im Zahnrad-Menü löscht Trainings-History und Körpergewicht (mit doppelter Rückfrage). Workouts, eigene Übungen und Farben bleiben erhalten.
+**Zurücksetzen:** „💉 Neustart mit Anabolika" im Zahnrad-Menü löscht Trainings-History und Messwerte (mit doppelter Rückfrage). Workouts, eigene Übungen und Farben bleiben erhalten.
+
+## Leaderboard (optional)
+
+Ein Freundes-Leaderboard über **Firebase** (Firestore + anonymer Login) — die **einzige** Ausnahme vom „alles lokal"-Prinzip. Im Tab 🏆 gibst du einen Anzeigenamen ein; danach wird nach jedem Training automatisch ein kleiner Datensatz hochgeladen (Name, Level + Titel, Punkte, Trainings dieses Jahr). Alle Teilnehmer sehen die nach Punkten sortierte Rangliste.
+
+- **Sicherheit:** Firestore-Regeln erlauben Lesen für alle, aber Schreiben/Löschen nur für den **eigenen** Eintrag (via anonymem Login). Die Regeln liegen in der Firebase-Konsole, nicht im Repo.
+- **Ehrensystem:** Es gibt keinen Server, der die Punkte prüft — technisch könnte jemand falsche Werte hochladen. Für einen Freundeskreis okay.
+- **Privatsphäre:** Sichtbar sind nur der selbst gewählte Anzeigename + die Stats. „Aus Rangliste entfernen" löscht den Eintrag wieder.
+- Die Firebase-Config im Code ist öffentlich (kein Geheimnis); die Sicherheit kommt aus den Regeln, nicht aus dem Verstecken der Config.
+
+Datenmodell: Sammlung `leaderboard`, Dokument-ID = anonyme User-ID, Felder `{ name, level, title, points, trainingsThisYear, updatedAt }`.
 
 ## Projektstruktur
 
@@ -91,6 +104,7 @@ Alle Daten liegen **nur auf dem Gerät** im `localStorage` (bei installierter PW
 | `points.js` | Punkteberechnung und Level |
 | `stats.js` | Statistik-Kacheln, Heatmap, Trainings-Log |
 | `share.js` | Workout als Link kodieren/dekodieren, Teilen & Import |
+| `leaderboard.js` | Freundes-Leaderboard (Firebase Firestore + anonymer Login) |
 | `animation.js` | Toast-Meldungen |
 | `sw.js` | Service Worker: Offline-Cache, Update-Strategie |
 | `manifest.json` | PWA-Manifest (Name, Icons, Farben) |
